@@ -27,9 +27,9 @@ app.use((req, res, next) => {
   next();
 });
 
-const userRoutes = require('./routes/user.Routes.js');
-const postRoutes = require('./routes/post.Routes.js');
-const commentRoutes = require('./routes/comment.Routes.js');
+const userRoutes = require('./routes/userRoute.js');
+const postRoutes = require('./routes/postRoutes.js');
+const commentRoutes = require('./routes/commentRoutes.js');
 
 //transforme le corps de la requête en objet JS utilisable //
 app.use(bodyParser.json());

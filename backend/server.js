@@ -1,7 +1,7 @@
 const http = require('http');
 const app = require('./app');
 const cors = require('cors');
-require ('dotenv').config({path: './config/.env'});
+require ('dotenv').config();
 
 app.use(cors());
 const normalizePort = val => {

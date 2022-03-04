@@ -5,8 +5,7 @@ let db = require('../models');
 const Post = db.Post;
 const User = db.User;
 const getAuthUserId = require('../middlewares/getAuthUserId.middleware');
-const post = require('../models/post');
-const { restart } = require('nodemon');
+
 
 // Créer un POST
 exports.createPost = (req, res, next) => {
@@ -180,3 +179,4 @@ exports.adminDeletePost =(req, res, next) => {
 };
  
 
+}

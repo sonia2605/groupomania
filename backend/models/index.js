@@ -18,8 +18,8 @@ db.Sequelize = Sequelize;
 
 // il donne post en minuscule, je crois q c Post
 db.Post = require('./Post')(sequelize, Sequelize);
-db.User = require('/User')(sequelize, Sequelize);
-db.Comment = require('/Comment')(sequelize, Sequelize);
+db.User = require('./User')(sequelize, Sequelize);
+db.Comment = require('./Comment')(sequelize, Sequelize);
 
 db.Post.belongsTo(db.User, {
   foreignKey: {

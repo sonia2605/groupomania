@@ -5,7 +5,7 @@ const auth = require('../middlewares/auth.middleware');
 const authAdmin =require('../middlewares/authAdmin.middleware');
 
 const multer = require('../middlewares/multer-config');
-const postCtrl = require('../controllers/post.controllers');
+const postCtrl = require('../controllers/posts');
 
 // Requête POST pour publier un nouveau post
 router.post('/post', auth, multer, postCtrl.createPost);
