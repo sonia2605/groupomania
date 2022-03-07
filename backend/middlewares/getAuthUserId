@@ -11,3 +11,4 @@ const userId = decodedToken.userId;
 
 return userId;
 };
+module.exports = getAuthUserId;

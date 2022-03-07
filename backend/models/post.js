@@ -14,8 +14,7 @@ static associate(models) {
 
 models.Post.hasMany(models.Comment);
   }
-};
-  
+}; 
   Post.init({
     userId: DataTypes.INTEGER,
     content: DataTypes.STRING,

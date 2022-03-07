@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
           onDelete: 'CASCADE',
           onUpdate: 'NO ACTION',
         });
-        models.Comment.belongsTo(models.Post, {
+        models.comments.belongsTo(models.Post, {
           foreignKey: {
   
             allowNull: false
@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
           onUpdate: 'NO ACTION',
         });
       }
-    };
+  };
   Comment.init({
     userId: DataTypes.INTEGER,
     postId: DataTypes.INTEGER,

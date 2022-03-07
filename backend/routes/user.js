@@ -5,8 +5,8 @@ const router = express.Router();
 const userCtrl = require('../controllers/users');
 
 // middleware d'identification
-const auth = require('../middlewares/auth.middleware');
-const authAdmin = require ('../middlewares/authAdmin.middleware')
+const auth = require('../middlewares/auth');
+const authAdmin = require ('../middlewares/authAdmin')
 const multer = require('../middlewares/multer-config');
 
 // Post CRUD 
@@ -26,7 +26,7 @@ router.put('/users/:id', auth, multer, userCtrl.updateProfil);
 router.delete('/users/:id', auth, multer, userCtrl.deleteProfil);
 
 // Suppression profil droit administrateur
-router.delete = require('/admin/delete/:id', authAdmin, multer, userCtrl.adminDeleteProfil);
+//router.delete = require('/admin/delete/:id', authAdmin, multer, userCtrl.adminDeleteProfilUser);
 
 
 

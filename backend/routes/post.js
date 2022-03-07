@@ -1,8 +1,8 @@
 const express=require('express');
 const router = express.Router();
 
-const auth = require('../middlewares/auth.middleware');
-const authAdmin =require('../middlewares/authAdmin.middleware');
+const auth = require('../middlewares/auth');
+const authAdmin =require('../middlewares/authAdmin');
 
 const multer = require('../middlewares/multer-config');
 const postCtrl = require('../controllers/posts');
@@ -17,7 +17,7 @@ router.put('/post/:id', auth, multer, postCtrl.updatePost);
 router.delete('/post/:id', auth, multer, postCtrl.deletePost);
 
 // Requête GET pour afficher les posts
-router.get('/post', auth, multer, postCtrlGetAllPosts);
+router.get('/post', auth, multer, postCtrl.getAllPosts);
 
 // Requête GET pour afficher un post 
 router.get('/post/:id', auth, multer, postCtrl.getOnePost);

@@ -3,12 +3,12 @@ const fs = require('fs');
 // on importe les modèles
 let db = require('../models');
 const Post = db.Post;
-const User = db.User;
-const getAuthUserId = require('../middlewares/getAuthUserId.middleware');
+const User = db.user;
+const getAuthUserId = require('../middlewares/getAuthUserId');
 
 
 // Créer un POST
-exports.createPost = (req, res, next) => {
+exports.createPost = (req, res) => {
     if(!req.body.content) {
         res.status(400).send({
             message: "Erreur, message vide"
@@ -45,7 +45,7 @@ exports.createPost = (req, res, next) => {
 }
 
 // Pour modifier une publication
-exports.updatePost = (req, res, next)=> {
+exports.updatePost = (req, res)=> {
     Post.findOne ({
         where: {id: req.params.id}
     })
@@ -72,7 +72,7 @@ exports.updatePost = (req, res, next)=> {
     });
 
 // Supprimer une publication
-exports.deletePost = (req, res, next) =>{
+exports.deletePost = (req, res) =>{
     Post.findOne({
         where: {
             id:req.params.id}
@@ -103,7 +103,7 @@ exports.deletePost = (req, res, next) =>{
         .then(()=> res.status(200).json({
             message: 'Suppression publication'
         }))
-        .catch(error => restart.status(400).json({
+        .catch(error => res.status(400).json({
             error
         }))
     }
@@ -115,7 +115,7 @@ exports.deletePost = (req, res, next) =>{
 };
 
 // Afficher un message
-exports.getOnePost = (req, res, next) => {
+exports.getOnePost = (req, res) => {
 // On récupère l'Id du post depuis la BDD
 Post.findOne ({
     whre: {id:req.params.id}
@@ -130,7 +130,7 @@ Post.findOne ({
 };
 
 // Afficher les posts
-exports.getAllPosts =(req, res, next) => {
+exports.getAllPosts =(req, res) => {
 // On récupère tous les posts
 Post.findAll({
     include: [{
@@ -146,7 +146,7 @@ Post.findAll({
 }))
 };
 
-exports.adminDeletePost =(req, res, next) => {
+exports.adminDeletePost =(req, res) => {
     Post.findOne({
         where: {id:req.params.id}
     })

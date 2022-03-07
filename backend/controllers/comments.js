@@ -1,4 +1,4 @@
-const getAuthUserId = require ('../middlewares/getAuthUserId.middleware');
+const getAuthUserId = require ('../middlewares/getAuthUserId');
 
 const db = require ('../models');
 const Comment = db.Comment;
@@ -6,7 +6,7 @@ const fs = require ('fs');
 
 
 // Création d'un commentaire
-exports.createComment = (req, res, next) => {
+exports.createComment = (req, res) => {
     if (!req.body.content) {
         res.status(400).send({
             message: "impossible de publier un commentaire vide !"
@@ -30,7 +30,7 @@ exports.createComment = (req, res, next) => {
 }
 
 // Afficher des commentaires
-exports.getComments = (req, res, next) => {
+exports.getComments = (req, res) => {
     Comment.findAll()
         .then((comments) => res.status(200).json(comments))
         .catch(error => res.status(400).json({
@@ -40,7 +40,7 @@ exports.getComments = (req, res, next) => {
 };
 
 // Supprimer son commentaire 
-exports.deleteComment = (req, res, next) => {
+exports.deleteComment = (req, res) => {
     Comment.findOne({
             where: {
                 id: req.params.id

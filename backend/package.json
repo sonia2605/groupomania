@@ -5,19 +5,20 @@
   "main": "nodemon server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "lint": "eslint./"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sonia2605/groupomania.git"
+    "url": "git+https://github.com/sonia2605/reseauSocial.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/sonia2605/group/issues"
+    "url": "https://github.com/sonia2605/reseauSocial/issues"
   },
-  "homepage": "https://github.com/sonia2605/group#readme",
+  "homepage": "https://github.com/sonia2605/reseauSocial#readme",
   "dependencies": {
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.2",
@@ -35,6 +36,8 @@
     "sequelize-cli": "^6.4.1"
   },
   "devDependencies": {
+    "eslint": "^8.10.0",
+    "eslint-plugin-vue": "^8.5.0",
     "nodemon": "^2.0.15"
   }
 }

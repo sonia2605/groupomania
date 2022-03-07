@@ -4,12 +4,12 @@ require("dotenv").config();
 const fs = require("fs");
 const passwordValidator = require("password-validator");
 
-const getAuthUserId = require("../middlewares/getAuthUserId.middleware");
+const getAuthUserId = require("../middlewares/getAuthUserId");
 
 //modèle
 const db = require("../models");
 const User = db.User;
-const Post = db.Post;
+//const Post = db.Post;
 
 //schéma de sécurité des mots de passe
 const schema = new passwordValidator();
@@ -22,7 +22,7 @@ schema
   .has().not().spaces() /*** mot de passe ne doit pas avoir d'espace ***/
   .is().not().oneOf(["Passw0rd","Password123",]); /*** Ces valeurs sont dans la liste noire ***/
 
-exports.signup = async (req, res, next) => {
+exports.signup = async (req, res) => {
 // si le mot de passe du visiteur ne respecte pas le schéma password 
   try {
     if (!schema.validate(req.body.password)) {
@@ -71,7 +71,7 @@ const mailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-
               })
             )
 
-            .catch((error) =>
+            .catch((err) =>
               res.status(400).json({
                 error,
                 message: "impossible de créer le compte ",
@@ -97,7 +97,7 @@ const mailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-
 };
 
 //POST/api/auth/login /connecter les utilisateurs existants
-exports.login = (req, res, next) => {
+exports.login = (req, res) => {
   try {
 // récupérer le user de la base de données avec findOne
     User.findOne({
@@ -162,7 +162,7 @@ exports.login = (req, res, next) => {
 };
 
 //Modifier le profil utilisateur
-exports.updateProfil = (req, res, next) => {
+exports.updateProfil = (req, res) => {
   const userObject = req.file
     ? {
         ...req.body.user,
@@ -215,7 +215,7 @@ exports.updateProfil = (req, res, next) => {
   });
 };
 // suppression du profil utilisateur
-exports.deleteProfil = (req, res, next) => {
+exports.deleteProfil = (req, res) => {
   User.findOne({
     where: {
       id: req.params.id,
@@ -246,10 +246,10 @@ exports.deleteProfil = (req, res, next) => {
   });
 };
 //Afficher un profil utilisateur
-exports.getProfil = async (req, res, next) => {
+exports.getProfil = async (req, res) => {
 //on récupère l'utilisateur depuis la base de données
   try {
-    const user = await User.findOne({
+    const User = await User.findOne({
       attributes: [
         "id",
         "firstName",
@@ -270,7 +270,7 @@ exports.getProfil = async (req, res, next) => {
       )
 
 // problème serveur 
-      .catch(function (err) {
+      .catch(function (error) {
         res.status(500).json({
           error,
           message: "profil introuvable",
@@ -283,7 +283,7 @@ exports.getProfil = async (req, res, next) => {
 
 //récuperation des profils ***/
 
-exports.getAllProfils = (req, res, next) => {
+exports.getAllProfils = (req, res) => {
   User.findAll({
     attributes: ["id", "firstName", "lastName", "email", "imageUrl", "isAdmin"],
   })
@@ -299,7 +299,7 @@ exports.getAllProfils = (req, res, next) => {
     );
 };
 
-exports.adminDeleteProfilUser = (req, res, next) => {
+exports.adminDeleteProfilUser = (req, res) => {
 // supprimer le compte user avec destroy 
   User.destroy({
     where: {
