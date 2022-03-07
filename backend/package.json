@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sonia2605/reseauSocial.git"
+    "url": "git+https://github.com/sonia2605/groupomania.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/sonia2605/reseauSocial/issues"
+    "url": "https://github.com/sonia2605/groupomania/issues"
   },
-  "homepage": "https://github.com/sonia2605/reseauSocial#readme",
+  "homepage": "https://github.com/sonia2605/groupomania#readme",
   "dependencies": {
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.2",
