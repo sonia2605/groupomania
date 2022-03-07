@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
   class Post extends Model {
     
 static associate(models) {
-    models.Post.belongsTo(models.User,
+    Post.belongsTo(models.User,
     {foreignKey: {
     allowNull: false
     }

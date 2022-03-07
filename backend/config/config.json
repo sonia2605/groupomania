@@ -2,7 +2,7 @@
   "development": {
     "username": "DB_USERNAME",
     "password": "DB_PASSWORD",
-    "database": "DB_NAME",
+    "database": "groupomania",
     "host": "DB_HOST",
     "port": 3306,
     "dialect": "mysql"
@@ -10,7 +10,7 @@
   "test": {
     "username": "DB_USERNAME",
     "password": "DB_PASSWORD",
-    "database": "DB_NAME",
+    "database": "groupomania",
     "host": "DB_HOST",
     "port": 3306,
     "dialect": "mysql"
@@ -18,7 +18,7 @@
   "production": {
     "username": "DB_USERNAME",
     "password": "DB_PASSWORD",
-    "database": "DB_NAME",
+    "database": "groupomania",
     "host": "DB_HOST",
     "port": 3306,
     "dialect": "mysql"

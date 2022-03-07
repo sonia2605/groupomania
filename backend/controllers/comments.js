@@ -2,7 +2,7 @@ const getAuthUserId = require ('../middlewares/getAuthUserId');
 
 const db = require ('../models');
 const Comment = db.Comment;
-const fs = require ('fs');
+//fs = require ('fs');
 
 
 // Création d'un commentaire
@@ -27,7 +27,7 @@ exports.createComment = (req, res) => {
             error,
             message: 'impossible de créer un commentaire'
         }))
-}
+},
 
 // Afficher des commentaires
 exports.getComments = (req, res) => {
@@ -61,5 +61,4 @@ exports.deleteComment = (req, res) => {
                 }))
         });
 
-
-}
+    }

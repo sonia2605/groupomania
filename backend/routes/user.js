@@ -26,7 +26,7 @@ router.put('/users/:id', auth, multer, userCtrl.updateProfil);
 router.delete('/users/:id', auth, multer, userCtrl.deleteProfil);
 
 // Suppression profil droit administrateur
-//router.delete = require('/admin/delete/:id', authAdmin, multer, userCtrl.adminDeleteProfilUser);
+router.delete('/admin/delete/:id', authAdmin, multer, userCtrl.adminDeleteProfilUser);
 
 
 

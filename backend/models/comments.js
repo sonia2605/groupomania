@@ -13,15 +13,15 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
         models.Comment.belongsTo(models.User, {
           foreignKey: {
-            //name: 'userId',
-            allowNull: false
+          //name: 'userId',
+            allowNull: false,
           },
           onDelete: 'CASCADE',
           onUpdate: 'NO ACTION',
         });
-        models.comments.belongsTo(models.Post, {
+        models.Comment.belongsTo(models.Post, {
           foreignKey: {
-  
+          //name: 'postId',
             allowNull: false
           },
           onDelete: 'CASCADE',

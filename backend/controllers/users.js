@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const fs = require("fs");
+fs = require("fs");
 const passwordValidator = require("password-validator");
 
 const getAuthUserId = require("../middlewares/getAuthUserId");
@@ -9,7 +9,6 @@ const getAuthUserId = require("../middlewares/getAuthUserId");
 //modèle
 const db = require("../models");
 const User = db.User;
-//const Post = db.Post;
 
 //schéma de sécurité des mots de passe
 const schema = new passwordValidator();
@@ -28,7 +27,7 @@ exports.signup = async (req, res) => {
     if (!schema.validate(req.body.password)) {
       return res.status(400).json({
         error:
-          "Votre mot de passe doit contenir des majuscules, des miniscules, au moins deux chiffres sans espace",
+          "Le mot de passe doit contenir des majuscules, des miniscules, au moins deux chiffres sans espace",
       });
     }
 //Les chiffres et les symboles ne sont pas autorisés. Minimum 3 caractéres et Maximum 20 caractères 
@@ -43,7 +42,7 @@ const mailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-
       bcrypt
         .hash(req.body.password, 10)
 // Création de user
-        .then((hash) => {
+        .then(hash => {
           User.create({
             id: req.body.id,
             firstName: req.body.firstName,
@@ -62,7 +61,7 @@ const mailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-
                     userId: user.id,
                     isAdmin: user.isAdmin,
                   },
-                  `${process.env.SECRET_KEY}`,
+                  `${process.env.SECRET_TOKEN}`,
                   {
                     expiresIn: "24h",
                   }
@@ -71,20 +70,20 @@ const mailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-
               })
             )
 
-            .catch((err) =>
+            .catch(error =>
               res.status(400).json({
                 error,
                 message: "impossible de créer le compte ",
               })
-            );
+            )
         })
 
-        .catch((error) =>
+        .catch(error =>
           res.status(500).json({
             error,
             message: "erreur serveur pour la création du compte",
           })
-        );
+        )
     } else {
       res.status(400).json({
         message:
@@ -108,7 +107,7 @@ exports.login = (req, res) => {
       .then((user) => {
         if (!user) {
           return res.status(404).json({
-            message: "Utilisateur introuvable",
+            message: "Utilisateur inconnu",
           });
         }
 // comparer le mot de passe avec bcrypt 
@@ -138,7 +137,7 @@ exports.login = (req, res) => {
                   userId: user.id,
                   isAdmin: user.isAdmin,
                 },
-                `${process.env.SECRET_KEY}`,
+                `${process.env.SECRET_TOKEN}`,
                 {
                   expiresIn: "24h",
                 }
@@ -153,7 +152,7 @@ exports.login = (req, res) => {
       })
       .catch((error) =>
         res.status(500).json({
-          error,
+          error
         })
       );
   } catch (error) {
@@ -175,23 +174,23 @@ exports.updateProfil = (req, res) => {
       };
   User.findOne({
     where: {
-      id: req.params.id,
-    },
-  }).then((user) => {
+      id: req.params.id
+    }
+  })
+  .then((user) => {
     if (user.id !== getAuthUserId(req)) {
       return res.status(401).json({
-        error,
-      });
+        error
+      })
     }
-    user
-      .update(
+    user.update(
         {
           ...userObject,
         },
         {
           where: {
             id: req.params.id,
-          },
+          }
         }
       )
       .then((user) =>
@@ -204,34 +203,34 @@ exports.updateProfil = (req, res) => {
             email: user.email,
             isAdmin: user.isAdmin,
             imageUrl: user.imageUrl,
-          },
+          }
         })
       )
-      .catch((error) =>
+      .catch(error =>
         res.status(405).json({
-          error,
+          error
         })
-      );
+      )
   });
-};
+}
 // suppression du profil utilisateur
 exports.deleteProfil = (req, res) => {
   User.findOne({
     where: {
       id: req.params.id,
-    },
-  }).then((user) => {
+    }
+  })
+  .then((user) => {
     if (user.id !== getAuthUserId(req)) {
       return res.status(401).json({
-        error,
-      });
+        error
+      })
     }
 // supprimer le user avec la fonction destroy 
-    user
-      .destroy({
+    user.destroy({
         where: {
           id: req.params.id,
-        },
+        }
       })
       .then(() =>
         res.status(200).json({
@@ -240,11 +239,11 @@ exports.deleteProfil = (req, res) => {
       )
       .catch((error) =>
         res.status(409).json({
-          error,
+          error
         })
-      );
-  });
-};
+      )
+  })
+}
 //Afficher un profil utilisateur
 exports.getProfil = async (req, res) => {
 //on récupère l'utilisateur depuis la base de données
@@ -259,13 +258,13 @@ exports.getProfil = async (req, res) => {
         "imageUrl",
       ],
       where: {
-        id: req.params.id,
-      },
+        id: req.params.id
+      }
     })
 
       .then((user) =>
         res.status(200).json({
-          user,
+          user
         })
       )
 
@@ -296,7 +295,7 @@ exports.getAllProfils = (req, res) => {
       res.status(404).json({
         error,
       })
-    );
+    )
 };
 
 exports.adminDeleteProfilUser = (req, res) => {
