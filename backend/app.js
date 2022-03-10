@@ -4,9 +4,9 @@ const path = require('path');
 const helmet = require ('helmet');
 const cors = require('cors');
 const bodyParser = require ('body-parser');
-const db = require('./models');
 const app = express();
 
+//const db = require('./models');
 app.use(cors());
 
 app.use(helmet());
@@ -23,16 +23,6 @@ app.use((req, res, next) => {
   next();
 });
 
-//Sequelize connection database
-db.sequelize
-    .authenticate()
-    .then(() => {
-        console.log('Connection réussie');
-    })
-    .catch(error => {
-        console.log('Connexion échouée : ', error);
-    })
-
 const userRoutes = require('./routes/user');
 const postRoutes = require('./routes/post');
 const commentRoutes = require('./routes/comment');
@@ -47,7 +37,15 @@ app.use(express.json());
 // les routes attendues par le frontend //
 
 app.use('/api/users', userRoutes);
-app.use('/api/posts', postRoutes);
-app.use('/api/comments', commentRoutes);
+app.use('/api/auth/posts', postRoutes);
+app.use('/api/auth/comments', commentRoutes);
+
+/*db.sequelize.authenticate()
+.then(() => {
+  console.log('connection réussie !');
+})
+.catch(error => {
+  console.log('connection échouée');
+})*/
 
 module.exports = app;
