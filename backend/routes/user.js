@@ -6,27 +6,22 @@ const userCtrl = require('../controllers/users');
 
 // middleware d'identification
 const auth = require('../middlewares/auth');
-const authAdmin = require ('../middlewares/authAdmin')
 const multer = require('../middlewares/multer-config');
 
 // Post CRUD 
 // Routes de l'API pour les utilisateurs 
-// Enregistrer un nouvel utilisateur
-router.post('/auth/signup', userCtrl.signup);
-// Connexion d'un utilisateur
-router.post('/auth/login', userCtrl.login);
+router.post('/signup', userCtrl.signup);
+router.post('/login', userCtrl.login);
 
-// Récupérer le profil utilisateur
-router.get('/users/:id', auth, multer, userCtrl.getProfil);
-// Récupérer les profils 
-router.get('/users', auth, userCtrl.getAllProfils);
-// Modifier le profil utilisateur
-router.put('/users/:id', auth, multer, userCtrl.updateProfil);
-// Supprimer le profil
-router.delete('/users/:id', auth, multer, userCtrl.deleteProfil);
 
-// Suppression profil droit administrateur
-router.delete('/admin/delete/:id', authAdmin, multer, userCtrl.adminDeleteProfilUser);
+router.get('/:id', auth, userCtrl.getOneUser);
+router.get('/', auth, userCtrl.getAllUsers);
+
+router.get('/:id/posts/comments', auth, userCtrl.findPostCom);
+
+router.put('/:id', auth, multer, userCtrl.updateUser);
+
+router.delete('/:id', auth, userCtrl.deleteUser);
 
 
 
