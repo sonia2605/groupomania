@@ -3,6 +3,7 @@ const app = require('./app');
 const cors = require('cors');
 require ('dotenv').config();
 
+
 app.use(cors());
 const normalizePort = val => {
   const port = parseInt(val, 10);
@@ -49,4 +50,4 @@ server.on('listening', () => {
   console.log('Listening on ' + bind);
 });
 
-server.listen(port);
+server.listen(process.env.PORT);
