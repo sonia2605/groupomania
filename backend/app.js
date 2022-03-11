@@ -37,8 +37,8 @@ app.use(express.json());
 // les routes attendues par le frontend //
 
 app.use('/api/users', userRoutes);
-app.use('/api/auth/posts', postRoutes);
-app.use('/api/auth/comments', commentRoutes);
+app.use('/api/posts', postRoutes);
+app.use('/api/comments', commentRoutes);
 
 /*db.sequelize.authenticate()
 .then(() => {

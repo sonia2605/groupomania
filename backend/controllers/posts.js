@@ -1,226 +1,133 @@
-const fs = require("fs");
+// Imports
+const jwt = require("jsonwebtoken");
+const db = require('../models/index');
+const fs = require('fs');
 
-// on importe les modèles
-let db = require("../models");
-const Post = db.Post;
-const User = db.User;
-const getAuthUserId = require("../middlewares/getAuthUserId");
+// Permet de créer un nouveau message
+exports.createPost = (req, res, next) => {   
+    const content = req.body.content;
 
-// Créer un POST
-exports.createPost = (req, res) => {
-  if (!req.body.content) {
-    res.status(400).send({
-      message: "Erreur, message vide",
-    });
-    return;
-  }
-  if (req.file) {
-    Post.create({
-      userId: getAuthUserId(req),
-      content: req.body.content,
-      imageUrl: `${req.protocol}://${req.get("host")}/images/${
-        req.file.filename
-      }`,
-    })
-      .then(() =>
-        res.status(201).json({
-          message: "post créé avec succès",
-        })
-      )
-      .catch((error) =>
-        res.status(400).json({
-          error,
-          message: "Impossible de publier le post",
-        })
-      );
-  } else {
-    Post.create({
-      userId: getAuthUserId(req),
-      content: req.body.content,
-      imageUrl: null,
-    })
-      .then(() =>
-        res.status(201).json({
-          message: "post créé !",
-        })
-      )
-      .catch((error) =>
-        res.status(400).json({
-          error,
-          message: "Publication impossible",
-        })
-      );
-  }
-};
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
+    const userId = decodedToken.userId;
+    
+    // Permet de vérifier que tous les champs sont complétés
+    if (content == null || content == '') {
+        return res.status(400).json({ error: 'Tous les champs doivent être renseignés' });
+    } 
 
-// Pour modifier une publication
-exports.updatePost = (req, res) => {
-  Post.findOne({
-    where: { id: req.params.id },
-  }).then((post) => {
-    if (post.userId !== getAuthUserId(req)) {
-      return res.status(404).json({
-        error,
-      });
+    // Permet de contrôler la longueur du titre et du contenu du message
+    if (content.length <= 4) {
+        return res.status(400).json({ error: 'Le contenu du message doit contenir au moins 4 caractères' });
     }
-    const postObjet = req.file
-      ? {
-          ...req.body.post,
-          imageUrl: `${req.protocol}://${req.get("host")}/images/${
-            req.file.filename
-          }`,
-        }
-      : { ...req.body };
-    Post.update(
-      {
-        ...postObjet,
-      },
-      { where: { id: req.params.id } }
-    )
-      .then(() =>
-        res.status(200).json({
-          message: "Publication modifiée avec succès",
-        })
-      )
-      .catch((error) =>
-        res.status(400).json({
-          error,
-        })
-      );
-  });
-
-  // Supprimer une publication
-  exports.deletePost = (req, res) => {
-    Post.findOne({
-      where: {
-        id: req.params.id,
-      },
+    
+    db.users.findOne({
+        where: { id: userId }
     })
-      .then((post) => {
-        if (post.userId !== getAuthUserId(req)) {
-          return res.status(404).json({
-            message: "Requête impossible ",
-          });
-        }
-        if (req.file) {
-          const filename = post.imageUrl.split("/images/")[1];
-          fs.unlink(`images/${filename}`, () => {
-            Post.destroy({
-              where: { id: req.params.id },
+    
+    .then(userFound => {
+        if(userFound) {
+            const post = db.posts.build({
+                content: req.body.content,
+                imageUrl: req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}`: req.body.imagePost,
+                UserId: userFound.id
             })
-              .then(() =>
-                res.status(200).json({
-                  message: "Publication supprimée avec succès",
-                })
-              )
-              .catch((error) =>
-                res.status(400).json({
-                  error,
-                })
-              );
-          });
+            post.save()
+            .then(() => res.status(201).json({ message: 'Votre message a bien été créé !' }))
+            .catch(error => res.status(400).json({ error: '⚠ Oops, une erreur s\'est produite !' }));
         } else {
-          Post.destroy({
-            where: { id: req.params.id },
-          })
-            .then(() =>
-              res.status(200).json({
-                message: "Suppression publication",
-              })
-            )
-            .catch((error) =>
-              res.status(400).json({
-                error,
-              })
-            );
+            return res.status(404).json({ error: 'Utilisateur non trouvé' })
         }
-      })
-      .catch((error) =>
-        res.status(500).json({
-          error,
-          message: "erreur, suppression impossible",
-        })
-      );
-  };
-
-  // Afficher un message
-  exports.getOnePost = (req, res) => {
-    // On récupère l'Id du post depuis la BDD
-    Post.findOne({
-      whre: { id: req.params.id },
     })
-      .then((post) =>
-        res.status(200).json({
-          post,
-        })
-      )
-      .catch((error) =>
-        res.status(404).json({
-          error,
-          message: "récupération publication impossible",
-        })
-      );
-  };
-
-  // Afficher les posts
-  exports.getAllPosts = (req, res) => {
-    // On récupère tous les posts
-    Post.findAll({
-      include: [
-        {
-          model: User,
-          attributes: ["firstname", "lastname", "imageurl"],
-        },
-      ],
-    })
-      .then((posts) =>
-        res.status(200).json({
-          posts,
-        })
-      )
-      .catch((error) =>
-        res.status(400).json({
-          error,
-        })
-      );
-  };
-
-  exports.adminDeletePost = (req, res) => {
-    Post.findOne({
-      where: { id: req.params.id },
-    }).then((post) => {
-      if (req.file) {
-        const filename = post.imageUrl.split("/images/")[1];
-        fs.unlink(`images/${filename}`, () => {
-          Post.destroy({
-            where: { id: req.params.id },
-          })
-            .then(() =>
-              res.status(200).json({
-                message: "publication membre supprimée avec succès",
-              })
-            )
-            .catch((error) =>
-              res.status(400).json({
-                error,
-              })
-            );
-        });
-      } else {
-        Post.destroy({
-          where: { id: req.params.id },
-        })
-          .then(() =>
-            res.status(200).json({
-              message: "La publication du membre est supprimée",
-            })
-          )
-          .catch((error) =>
-            res.status(400).json({
-              error,
-            })
-          );
-      }
-    });
-  };
+    .catch(error => res.status(500).json({ error: '⚠ Oops, une erreur s\'est produite !' }));
 };
+
+
+// Permet d'afficher tous les messages
+exports.getAllPosts = (req, res, next) => {
+    db.posts.findAll({
+        order: [['createdAt', "DESC"]] ,
+        include: [{
+            model: db.users,
+            attributes: [ 'username', 'imageProfile' ]
+        },{
+            model: db.comments
+        }]
+    })
+    .then(postFound => {
+        if(postFound) {
+            res.status(200).json(postFound);
+        } else {
+            res.status(404).json({ error: 'Aucun message trouvé' });
+        }
+    })
+    .catch(error => {
+        res.status(500).send({ error: '⚠ Oops, une erreur s\'est produite !' });
+    });
+}
+
+
+// Permet de modifier un message
+exports.modifyPost = (req, res, next) => {
+    console.log('file', req.file);
+    console.log('content', req.body.content);
+    console.log('bodypost', req.body.post);
+    const postObject = req.file ?
+    {
+    content: req.body.content,
+    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    } : { ...req.body };
+
+    console.log('body', req.body);
+    console.log(req.params.postId);
+
+    db.posts.findOne({
+        where: {  id: req.params.postId },
+    })
+    .then(postFound => {
+        if(postFound) {
+            db.posts.update(postObject, {
+                where: { id: req.params.postId}
+            })
+            .then(post => res.status(200).json({ message: 'Votre message a bien été modifié !' }))
+            .catch(error => res.status(400).json({ error: '⚠ Oops, une erreur s\'est produite !' }))
+        }
+        else {
+            res.status(404).json({ error: 'Message non trouvé' });
+        }
+    })
+    .catch(error => res.status(500).json({ error: '⚠ Oops, une erreur s\'est produite !' }));
+}
+
+
+// Permet de supprimer un message
+exports.deletePost = (req, res, next) => {
+    db.posts.findOne({
+        attributes: ['id'],
+        where: { id: req.params.postId }
+    })
+    .then(post => {
+        if(post) {
+            if(post.imagePost != null) {
+                const filename = post.imagePost.split('/images/')[1];
+            
+                fs.unlink(`images/${filename}`, () => {
+                    db.postsosts.destroy({ 
+                        where: { id: req.params.postId } 
+                    })
+                    .then(() => res.status(200).json({ message: 'Votre message a été supprimé' }))
+                    .catch(() => res.status(500).json({ error: '⚠ Oops, une erreur s\'est produite !' }));
+                })
+            } else {
+                db.posts.destroy({ 
+                    where: { id: req.params.postId } 
+                })
+                .then(() => res.status(200).json({ message: 'Votre message a été supprimé' }))
+                .catch(() => res.status(500).json({ error: '⚠ Oops, une erreur s\'est produite !' }));
+            }
+        } else {
+            return res.status(404).json({ error: 'Message non trouvé'})
+        }
+    })
+    .catch(error => res.status(500).json({ error: '⚠ Oops, une erreur s\'est produite !' }));
+}

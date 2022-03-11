@@ -1,319 +1,179 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-fs = require("fs");
-const passwordValidator = require("password-validator");
 
-const getAuthUserId = require("../middlewares/getAuthUserId");
 
-//modèle
-const db = require("../models");
-const User = db.User;
+const db = require('../models/index.js');
 
-//schéma de sécurité des mots de passe
-const schema = new passwordValidator();
-schema
-  .is().min(6) /*** minimum 6 caractères ***/
-  .is().max(15) /*** maximum 15 caractères ***/
-  .has().uppercase() /*** mot de passe doit contenir des lettres majuscules ***/
-  .has().lowercase() /*** mot de passe doit contenir des lettres miniscules  ***/
-  .has().digits(2) /*** mot de passe doit contenir deux chiffres minimun ***/
-  .has().not().spaces() /*** mot de passe ne doit pas avoir d'espace ***/
-  .is().not().oneOf(["Passw0rd","Password123",]); /*** Ces valeurs sont dans la liste noire ***/
 
-exports.signup = async (req, res) => {
-// si le mot de passe du visiteur ne respecte pas le schéma password 
-  try {
-    if (!schema.validate(req.body.password)) {
-      return res.status(400).json({
-        error:
-          "Le mot de passe doit contenir des majuscules, des miniscules, au moins deux chiffres sans espace",
-      });
+// Regex de validation
+const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*]).{8,20}/;
+
+
+// Permet de créer un nouvel utilisateur
+exports.signup = (req, res, next) => {
+    var username = req.body.username;
+    var email    = req.body.email;
+    var password = req.body.password;
+
+    // Permet de vérifier que tous les champs sont complétés
+    if(email == null || email == '' || username == null || username == ''|| password == null || password == '') {
+        return res.status(400).json({ error: 'Tous les champs doivent être renseignés' });
+    } 
+
+    // Permet de contrôler la longueur du pseudo
+    if(username.length <= 3 || username.length >= 15) {
+        return res.status(400).json({ error: 'Le pseudo doit contenir 3 à 15 caractères' });
     }
-//Les chiffres et les symboles ne sont pas autorisés. Minimum 3 caractéres et Maximum 20 caractères 
-const firstNameRegex = /^([A-Za-z]{3,20})?([-]{0,1})?([A-Za-z\s]{3,20})$/;
-const lastNameRegex = /^([A-Za-z]{3,20})?([-]{0,1})?([A-Za-z\s]{3,20})$/;
-const mailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-    if (
-      firstNameRegex.test(req.body.firstName) && lastNameRegex.test(req.body.lastName) &&
-      mailRegex.test(req.body.email)
-    ) {
-// appeler bcrypt et hasher le mot de passe, l'algorithme fera 10 tours
-      bcrypt
-        .hash(req.body.password, 10)
-// Création de user
-        .then(hash => {
-          User.create({
-            id: req.body.id,
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email,
-            password: hash,
-            isAdmin: req.body.isAdmin,
-          })
 
-            .then((user) =>
-              res.status(201).json({
-                userId: user.id,
-                isAdmin: user.isAdmin,
-                token: jwt.sign(
-                  {
+    // Permet de contrôler la validité de l'adresse mail
+    if(!emailRegex.test(email)) {
+        return res.status(400).json({ error: 'Adresse mail invalide' });
+    }
+
+    // Permet de contrôler la validité du mot de passe
+    if(!passwordRegex.test(password)) {
+        return res.status(400).json({ error: 'Le mot de passe doit contenir entre 8 et 20 caractères dont au moins une lettre majuscule, une lettre minusucle, un chiffre et un symbole' });
+    }
+
+    // Permet de vérifier que l'utilisateur que l'on souhaite créer n'existe pas déjà
+    db.User.findOne({
+        attributes: ['username' || 'email'],
+        where: { 
+            username: username, 
+            email: email
+        }
+    })
+    .then(userExist => {
+        if(!userExist) {
+            bcrypt.hash(req.body.password, 10)
+            .then(hash => {
+                const user = db.users.build({
+                    userFirstName: req.body.userFirstName,
+                    userLastName: req.body.userLastName,
+                    email: req.body.email,
+                    password: hash,
+                    isAdmin: 0
+                });
+                user.save()
+                    .then(() => res.status(201).json({ message: 'Votre compte a bien été créé !' }))
+                    .catch(error => res.status(400).json({ error: '⚠ Oops, une erreur s\'est produite !' }));
+            })
+            .catch(error => res.status(500).json({ error: 'Une erreur s\'est produite lors de la création de votre compte' }));
+        } else {
+            return res.status(404).json({ error: 'Cet utilisateur existe déjà' })
+        }
+    })
+    .catch(error => res.status(500).json({ error: '⚠ Oops, une erreur s\'est produite !' }));
+};
+
+
+// Permet à un utilisateur de se connecter
+exports.login = (req, res, next) => {
+    db.users.findOne({
+        where: { email: req.body.email }
+    })
+    .then(user => {
+        if(user) {
+            bcrypt.compare(req.body.password, user.password)
+            .then(valid => {
+                if(!valid) {
+                    return res.status(401).json({ error: 'Mot de passe incorrect' });
+                }
+                res.status(200).json({
                     userId: user.id,
                     isAdmin: user.isAdmin,
-                  },
-                  `${process.env.SECRET_TOKEN}`,
-                  {
-                    expiresIn: "24h",
-                  }
-                ),
-                message: "utilisateur créé et connecté",
-              })
-            )
-
-            .catch(error =>
-              res.status(400).json({
-                error,
-                message: "impossible de créer le compte ",
-              })
-            )
-        })
-
-        .catch(error =>
-          res.status(500).json({
-            error,
-            message: "erreur serveur pour la création du compte",
-          })
-        )
-    } else {
-      res.status(400).json({
-        message:
-          " paramètres incorrects, veuillez vérifier vos données ",
-      });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-//POST/api/auth/login /connecter les utilisateurs existants
-exports.login = (req, res) => {
-  try {
-// récupérer le user de la base de données avec findOne
-    User.findOne({
-      where: {
-        email: req.body.email,
-      },
-    })
-      .then((user) => {
-        if (!user) {
-          return res.status(404).json({
-            message: "Utilisateur inconnu",
-          });
-        }
-// comparer le mot de passe avec bcrypt 
-        bcrypt
-          .compare(req.body.password, user.password)
-          .then((valid) => {
-            if (!valid) {
-              return res.status(401).json({
-                message: "Mot de passe incorrect ",
-              });
-            }
-
-            res.status(200).json({
-              user: {
-                id: user.id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: req.body.email,
-                password: req.body.password,
-                isAdmin: user.isAdmin,
-                imageUrl: user.imageUrl,
-              },
-              userId: user.id,
-              isAdmin: user.isAdmin,
-              token: jwt.sign(
-                {
-                  userId: user.id,
-                  isAdmin: user.isAdmin,
-                },
-                `${process.env.SECRET_TOKEN}`,
-                {
-                  expiresIn: "24h",
-                }
-              ),
-            });
-          })
-          .catch((error) =>
-            res.status(500).json({
-              error,
+                    userFirstName: user.userFirstName,
+                    userLastName: user.userLastName,
+                    imageUrl: user.imageProfile,
+                    token: jwt.sign(
+                        {userId: user.id},
+                        process.env.SECRET_TOKEN,
+                        {expiresIn: '24h'}
+                    )
+                });
             })
-          );
-      })
-      .catch((error) =>
-        res.status(500).json({
-          error
-        })
-      );
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-//Modifier le profil utilisateur
-exports.updateProfil = (req, res) => {
-  const userObject = req.file
-    ? {
-        ...req.body.user,
-        imageUrl: `${req.protocol}://${req.get("host")}/images/${
-          req.file.filename
-        }`,
-      }
-    : {
-        ...req.body,
-      };
-  User.findOne({
-    where: {
-      id: req.params.id
-    }
-  })
-  .then((user) => {
-    if (user.id !== getAuthUserId(req)) {
-      return res.status(401).json({
-        error
-      })
-    }
-    user.update(
-        {
-          ...userObject,
-        },
-        {
-          where: {
-            id: req.params.id,
-          }
+            .catch(error => res.status(500).json({ error: '⚠ Oops, une erreur s\'est produite !' }));
+        } else {
+            return res.status(404).json({ error: 'Cet utilisateur n\'existe pas, veuillez créer un compte' })
         }
-      )
-      .then((user) =>
-        res.status(200).json({
-          message: "Profil à jour !",
-          user: {
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            isAdmin: user.isAdmin,
-            imageUrl: user.imageUrl,
-          }
-        })
-      )
-      .catch(error =>
-        res.status(405).json({
-          error
-        })
-      )
-  });
-}
-// suppression du profil utilisateur
-exports.deleteProfil = (req, res) => {
-  User.findOne({
-    where: {
-      id: req.params.id,
-    }
-  })
-  .then((user) => {
-    if (user.id !== getAuthUserId(req)) {
-      return res.status(401).json({
-        error
-      })
-    }
-// supprimer le user avec la fonction destroy 
-    user.destroy({
-        where: {
-          id: req.params.id,
-        }
-      })
-      .then(() =>
-        res.status(200).json({
-          message: "Profil supprimé avec succès",
-        })
-      )
-      .catch((error) =>
-        res.status(409).json({
-          error
-        })
-      )
-  })
-}
-//Afficher un profil utilisateur
-exports.getProfil = async (req, res) => {
-//on récupère l'utilisateur depuis la base de données
-  try {
-    const User = await User.findOne({
-      attributes: [
-        "id",
-        "firstName",
-        "lastName",
-        "email",
-        "isAdmin",
-        "imageUrl",
-      ],
-      where: {
-        id: req.params.id
-      }
     })
+    .catch(error => res.status(500).json({ error: '⚠ Oops, une erreur s\'est produite !' }));
+}
 
-      .then((user) =>
-        res.status(200).json({
-          user
-        })
-      )
 
-// problème serveur 
-      .catch(function (error) {
-        res.status(500).json({
-          error,
-          message: "profil introuvable",
-        });
-      });
-  } catch (error) {
-    console.log(error);
-  }
-};
+// Permet à un utilisateur d'accéder à son profil
+exports.getUserProfile = (req, res, next) => {
+    const id = req.params.id;
+    db.users.findOne({
+        attributes: [ 'id', 'username', 'email', 'isAdmin', 'imageProfile' ],
+        where: { id: id }
+    })
+    .then(user => {
+        if(user) {
+            res.status(200).json(user);
+        } else {
+            res.status(404).json({ error: 'Utilisateur non trouvé' })
+        }
+    })
+    .catch(error => res.status(404).json({ error: '⚠ Oops, une erreur s\'est produite !' }));
+}
 
-//récuperation des profils ***/
 
-exports.getAllProfils = (req, res) => {
-  User.findAll({
-    attributes: ["id", "firstName", "lastName", "email", "imageUrl", "isAdmin"],
-  })
-    .then((users) =>
-      res.status(200).json({
-        users,
-      })
-    )
-    .catch((error) =>
-      res.status(404).json({
-        error,
-      })
-    )
-};
+// Permet à un utilisateur de modifier son profil
+exports.modifyUserProfile = (req, res, next) => {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
+    const userId = decodedToken.userId;
 
-exports.adminDeleteProfilUser = (req, res) => {
-// supprimer le compte user avec destroy 
-  User.destroy({
-    where: {
-      id: req.params.id,
-    },
-  })
-    .then(() =>
-      res.status(200).json({
-        message: "Profil utilisateur supprimé !",
-      })
-    )
-    .catch((error) =>
-      res.status(403).json({
-        error,
-      })
-    );
-  console.log(User.destroy);
-};
+    req.body.user = userId
+    
+    
+    console.log('bodyUser', req.body.user);
+    const userObject = req.file ?
+    {
+    ...JSON.parse(req.body.user),
+    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    } : { ...req.body };
+    
+    db.users.findOne({
+        where: { id: userId },
+    })
+    .then(userFound => {
+        if(userFound) {
+            db.users.update(userObject, {
+                where: { id: userId}
+            })
+            .then(user => res.status(200).json({ message: 'Votre profil a bien été modifié !' }))
+            .catch(error => res.status(400).json({ error: '⚠ Oops, une erreur s\'est produite !' }))
+        }
+        else {
+            res.status(404).json({ error: 'Utilisateur non trouvé' });
+        }
+    })
+    .catch(error => res.status(500).json({ error: '⚠ Oops, une erreur s\'est produite !' }));
+}
+
+
+// Permet à un utilisateur de supprimer son compte
+exports.deleteAccount = (req, res, next) => {
+    const id = req.params.id;
+    db.users.findOne({
+        attributes: ['id'],
+        where: { id: id }
+    })
+    .then(user => {
+        if(user) {
+            db.users.destroy({ 
+                where: { id: id } 
+            })
+            .then(() => res.status(200).json({ message: 'Votre compte a été supprimé' }))
+            .catch(() => res.status(500).json({ error: '⚠ Oops, une erreur s\'est produite !' }));
+            
+        } else {
+            return res.status(404).json({ error: 'Utilisateur non trouvé' })
+        }
+    })
+    .catch(error => res.status(500).json({ error: ' une erreur s\'est produite !' }));
+}

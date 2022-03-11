@@ -14,14 +14,11 @@ router.post('/signup', userCtrl.signup);
 router.post('/login', userCtrl.login);
 
 
-router.get('/:id', auth, userCtrl.getOneUser);
-router.get('/', auth, userCtrl.getAllUsers);
+router.get('/:id', auth, userCtrl.getUserProfile);
 
-router.get('/:id/posts/comments', auth, userCtrl.findPostCom);
+router.put('/:id', auth, multer, userCtrl.modifyUserProfile);
 
-router.put('/:id', auth, multer, userCtrl.updateUser);
-
-router.delete('/:id', auth, userCtrl.deleteUser);
+router.delete('/:id', auth, userCtrl.deleteAccount);
 
 
 
