@@ -1,36 +1,25 @@
 'use strict';
-const { 
+const {
   Model
 } = require('sequelize');
-module.exports = (sequelize, DataTypes) => /*sequelize.define("comments",*/ {
-class comments extends Model {
-
-  static associate(models) {
-    // define association here
-    models.comments.belongsTo(models.users,
-            { foreignKey: {
-        allowNull: false
-       
-      }, onDelete:'CASCADE',
-    }),
-      models.comments.belongsTo(models.posts, 
-        { foreignKey: {
-          allowNull: false,
-             
-        }, onDelete:'CASCADE',
+module.exports = (sequelize, DataTypes) => {
+  class Comment extends Model {
+    static associate(models) {
+      models.Comment.belongsTo(models.User, {
+        foreignKey: 'userId'
       })
+      models.Comment.belongsTo(models.Post, {
+        foreignKey: 'postId'
+      })
+    }
   }
-  
-};
-  comments.init ({
-  content: {
-    type: DataTypes.STRING,
-    allowNull: false
-  }
+  Comment.init({
+    userId: DataTypes.INTEGER,
+    postId: DataTypes.INTEGER,
+    content: DataTypes.TEXT
   }, {
     sequelize,
-    modelName: 'comments',
+    modelName: 'Comment',
   });
-  return comments;
+  return Comment;
 };
-  

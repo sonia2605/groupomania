@@ -1,7 +1,7 @@
 const http = require('http');
 const app = require('./app');
 const cors = require('cors');
-require ('dotenv').config();
+require ('dotenv').config({path: './config/.env'});
 
 
 app.use(cors());

@@ -2,43 +2,22 @@
 const {
   Model
 } = require('sequelize');
-module.exports = (sequelize, DataTypes) => /*sequelize.define("users",*/ {
-  class users extends Model {
-  static associate(models) {
-    // define association here
-    models.users.hasMany(models.posts);
-    models.users.hasMany(models.comments);
+module.exports = (sequelize, DataTypes) => {
+  class User extends Model {
+    static associate(models) {
+      models.User.hasMany(models.Post);
+      models.User.hasMany(models.Comment);
+    }
   }
-}
-
-  users.init ({
-  firstName: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  lastName: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  imageUrl: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  isAdmin: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false
-  }
+  User.init({
+    username: DataTypes.STRING,
+    email: DataTypes.STRING,
+    password: DataTypes.STRING,
+    isAdmin: DataTypes.BOOLEAN,
+    imageUrl: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'users',
+    modelName: 'User',
   });
-  return users;
+  return User;
 };

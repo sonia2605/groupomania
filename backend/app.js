@@ -1,5 +1,7 @@
 const express = require ('express');
 require ('dotenv').config();
+
+// accéder au chemin du système de fichiers
 const path = require('path');
 const helmet = require ('helmet');
 const cors = require('cors');
@@ -36,16 +38,10 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(express.json());
 // les routes attendues par le frontend //
 
-app.use('/api/users', userRoutes);
-app.use('/api/posts', postRoutes);
-app.use('/api/comments', commentRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/post', postRoutes);
+app.use('/api/comment', commentRoutes);
 
-/*db.sequelize.authenticate()
-.then(() => {
-  console.log('connection réussie !');
-})
-.catch(error => {
-  console.log('connection échouée');
-})*/
+
 
 module.exports = app;
