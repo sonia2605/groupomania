@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 require("dotenv").config({ path: "./config/.env" });
-const {User} = require('../models/index.js');
+const {user} = require('../models/index.js');
 const db = require("../models/index.js");
 
 // Regex de validation
@@ -27,26 +27,26 @@ exports.signup = (req, res) => {
     password == null ||
     password == ""
   ) {
-    return res
+    res
       .status(400)
       .json({ error: "Tous les champs doivent être renseignés" });
   }
 
   // Permet de contrôler la longueur du pseudo
   if (username.length <= 3 || username.length >= 15) {
-    return res
+    res
       .status(400)
       .json({ error: "Le pseudo doit contenir 3 à 15 caractères" });
   }
 
   // Permet de contrôler la validité de l'adresse mail
   if (!emailRegex.test(email)) {
-    return res.status(400).json({ error: "Adresse mail invalide" });
+    res.status(400).json({ error: "Adresse mail invalide" });
   }
 
   // Permet de contrôler la validité du mot de passe
   if (!passwordRegex.test(password)) {
-    return res
+    res
       .status(400)
       .json({
         error:
@@ -95,7 +95,7 @@ exports.signup = (req, res) => {
               })
           );
       } else {
-        return res.status(404).json({ error: "Cet utilisateur existe déjà" });
+        res.status(404).json({ error: "Cet utilisateur existe déjà" });
       }
     })
     .catch(() =>
@@ -114,7 +114,7 @@ exports.login = (req, res) => {
           .compare(req.body.password, user.password)
           .then((valid) => {
             if (!valid) {
-              return res.status(401).json({ error: "Mot de passe incorrect" });
+            res.status(401).json({ error: "Mot de passe incorrect" });
             }
             res.status(200).json({
               userId: user.id,
@@ -231,7 +231,7 @@ exports.deleteAccount = (req, res) => {
               .json({ error: "Une erreur s'est produite !" })
           );
       } else {
-        return res.status(404).json({ error: "Utilisateur non trouvé" });
+      res.status(404).json({ error: "Utilisateur non trouvé" });
       }
     })
     .catch(() =>

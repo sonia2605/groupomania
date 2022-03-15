@@ -13,14 +13,14 @@ exports.createPost = (req, res) => {
 
   // Permet de vérifier que tous les champs sont complétés
   if (content == null || content == "") {
-    return res
+    res
       .status(400)
       .json({ error: "Tous les champs doivent être renseignés" });
   }
 
   // Permet de contrôler la longueur du titre et du contenu du message
   if (content.length <= 4) {
-    return res
+    res
       .status(400)
       .json({
         error: "Le contenu du message doit contenir au moins 4 caractères",
@@ -51,7 +51,7 @@ exports.createPost = (req, res) => {
               .json({ error: "Une erreur s'est produite !" })
           );
       } else {
-        return res.status(404).json({ error: "Utilisateur non trouvé" });
+        res.status(404).json({ error: "Utilisateur non trouvé" });
       }
     })
     .catch(() =>
@@ -169,7 +169,7 @@ exports.deletePost = (req, res) => {
             );
         }
       } else {
-        return res.status(404).json({ error: "Message non trouvé" });
+      res.status(404).json({ error: "Message non trouvé" });
       }
     })
     .catch(() =>
