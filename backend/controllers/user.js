@@ -2,15 +2,13 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-require("dotenv").config({ path: "./config/.env" });
-const {user} = require('../models/index.js');
+require("dotenv").config();
 const db = require("../models/index.js");
 
 // Regex de validation
 const emailRegex =
-/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-const passwordRegex =
-/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,20}/;
+  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,20}/;
 
 // Permet de créer un nouvel utilisateur
 exports.signup = (req, res) => {
@@ -27,36 +25,31 @@ exports.signup = (req, res) => {
     password == null ||
     password == ""
   ) {
-    res
-      .status(400)
-      .json({ error: "Tous les champs doivent être renseignés" });
+    return res.status(400).json({ error: "Tous les champs doivent être renseignés" });
   }
 
   // Permet de contrôler la longueur du pseudo
   if (username.length <= 3 || username.length >= 15) {
-    res
+    return res
       .status(400)
       .json({ error: "Le pseudo doit contenir 3 à 15 caractères" });
   }
 
   // Permet de contrôler la validité de l'adresse mail
   if (!emailRegex.test(email)) {
-    res.status(400).json({ error: "Adresse mail invalide" });
+   return res.status(400).json({ error: "Adresse mail invalide" });
   }
 
   // Permet de contrôler la validité du mot de passe
   if (!passwordRegex.test(password)) {
-    res
-      .status(400)
-      .json({
-        error:
-    "Le mot de passe doit contenir entre 8 et 20 caractères dont au moins une lettre majuscule, une lettre minuscule, un chiffre",
-      });
+  return res.status(400).json({
+      error:
+        "Le mot de passe doit contenir entre 8 et 20 caractères dont au moins une lettre majuscule, une lettre minuscule, un chiffre",
+    });
   }
 
   // Permet de vérifier que l'utilisateur que l'on souhaite créer n'existe pas déjà
   db.User.findOne({
-    attributes: ["username" || "email"],
     where: {
       username: username,
       email: email,
@@ -80,27 +73,19 @@ exports.signup = (req, res) => {
                   .status(201)
                   .json({ message: "Votre compte a bien été créé !" })
               )
-              .catch(() =>
-                res
-                  .status(400)
-                  .json({ error: "Une erreur s'est produite !" })
-              );
+              .catch((error) => res.status(400).json({ error: error }));
           })
           .catch(() =>
-            res
-              .status(500)
-              .json({
-                error:
-                  "Une erreur s'est produite lors de la création de votre compte",
-              })
+            res.status(500).json({
+              error:
+                "Une erreur s'est produite lors de la création de votre compte",
+            })
           );
       } else {
-        res.status(404).json({ error: "Cet utilisateur existe déjà" });
+      return  res.status(404).json({ error: "Cet utilisateur existe déjà" });
       }
     })
-    .catch(() =>
-      res.status(500).json({ error: "Une erreur s'est produite !" })
-    );
+
 };
 
 // Permet à un utilisateur de se connecter
@@ -108,62 +93,47 @@ exports.login = (req, res) => {
   db.User.findOne({
     where: { email: req.body.email },
   })
-    .then((user) => {
+    .then(async (user) => {
       if (user) {
-        bcrypt
-          .compare(req.body.password, user.password)
-          .then((valid) => {
-            if (!valid) {
-            res.status(401).json({ error: "Mot de passe incorrect" });
-            }
-            res.status(200).json({
-              userId: user.id,
-              isAdmin: user.isAdmin,
-              username: user.username,
-              imageUrl: user.imageUrl,
-              token: jwt.sign(
-                { userId: user.id },
-                process.env.SECRET_TOKEN,
-                { expiresIn: "24h" }
-              ),
-            });
-          })
-          .catch(() =>
-            res
-              .status(500)
-              .json({ error: "Une erreur s'est produite !" })
-          );
+        const isValid = await bcrypt.compare(req.body.password, user.password);
+        if (!isValid) {
+          res.status(401).json({ error: "Mot de passe incorrect" });
+        }
+
+        res.status(200).json({
+          userId: user.id,
+          isAdmin: user.isAdmin,
+          username: user.username,
+          
+          token: jwt.sign({ userId: user.id },
+          process.env.SECRET_TOKEN,
+          {expiresIn: "24h"},
+          ),
+           message: "Bonjour" +" "+ user.username + "!",
+        });
       } else {
-        return res
-          .status(404)
-          .json({
-            error: "Cet utilisateur n'existe pas, veuillez créer un compte",
-          });
+      return res.status(404).json({
+          error: "Cet utilisateur n'existe pas, veuillez créer un compte",
+        });
       }
     })
-    .catch(() =>
-      res.status(500).json({ error: "Une erreur s'est produite !" })
-    );
 };
 
 // Permet à un utilisateur d'accéder à son profil
 exports.getUserProfile = (req, res) => {
   const id = req.params.id;
   db.User.findOne({
-    attributes: ["id", "username", "email", "isAdmin", "imageUrl"],
-    where: { id: id },
+      where: { id: id }
   })
-    .then((user) => {
-      if (user) {
-        res.status(200).json(user);
+  .then(user => {
+      if(user) {
+          res.status(200).json(user);
       } else {
-        res.status(404).json({ error: "Utilisateur non trouvé" });
+        return  res.status(404).json({ error: 'Utilisateur non trouvé' })
       }
-    })
-    .catch(() =>
-      res.status(404).json({ error: "Une erreur s'est produite !" })
-    );
-};
+  })
+  .catch(error => res.status(404).json({ error: "erreur serveur"}));
+}
 
 // Permet à un utilisateur de modifier son profil
 exports.modifyUserProfile = (req, res) => {
@@ -174,14 +144,14 @@ exports.modifyUserProfile = (req, res) => {
   req.body.user = userId;
 
   console.log("bodyUser", req.body.user);
-  const userObject = req.file
-    ? {
+  const userObject = req.file 
+  /* ? {
         ...JSON.parse(req.body.user),
         imageUrl: `${req.protocol}://${req.get("host")}/images/${
           req.file.filename
         }`,
       }
-    : { ...req.body };
+    : { ...req.body };*/
 
   db.User.findOne({
     where: { id: userId },
@@ -192,14 +162,10 @@ exports.modifyUserProfile = (req, res) => {
           where: { id: userId },
         })
           .then((user) =>
-            res
-              .status(200)
-              .json({ message: "Profil modifié avec succès !" })
+            res.status(200).json({ message: "Profil modifié avec succès !" })
           )
           .catch(() =>
-            res
-              .status(400)
-              .json({ error: "Une erreur s'est produite !" })
+            res.status(400).json({ error: "Une erreur s'est produite !" })
           );
       } else {
         res.status(404).json({ error: "Utilisateur non trouvé" });
@@ -214,7 +180,6 @@ exports.modifyUserProfile = (req, res) => {
 exports.deleteAccount = (req, res) => {
   const id = req.params.id;
   db.User.findOne({
-    attributes: ["id"],
     where: { id: id },
   })
     .then((user) => {
@@ -226,12 +191,10 @@ exports.deleteAccount = (req, res) => {
             res.status(200).json({ message: "Votre compte a été supprimé" })
           )
           .catch(() =>
-            res
-              .status(500)
-              .json({ error: "Une erreur s'est produite !" })
+            res.status(500).json({ error: "Une erreur s'est produite !" })
           );
       } else {
-      res.status(404).json({ error: "Utilisateur non trouvé" });
+      return  res.status(404).json({ error: "Utilisateur non trouvé" });
       }
     })
     .catch(() =>

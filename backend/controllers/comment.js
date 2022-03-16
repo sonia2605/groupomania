@@ -31,7 +31,7 @@ exports.createComment = (req, res) => {
               .json({ error: "Une erreur s'est produite !" })
           );
       } else {
-      res.status(404).json({ error: "Message non trouvé" });
+      return res.status(404).json({ error: "Message non trouvé" });
       }
     })
     .catch(() =>
@@ -89,7 +89,7 @@ exports.deleteComment = (req, res) => {
               .json({ error: "Une erreur s'est produite !" })
           );
       } else {
-      res.status(404).json({ error: "Commentaire non trouvé" });
+      return res.status(404).json({ error: "Commentaire non trouvé" });
       }
     })
     .catch(() =>

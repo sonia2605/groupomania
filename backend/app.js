@@ -36,11 +36,14 @@ app.use(bodyParser.urlencoded({extended: true}));
 //Indique à Express qu'il faut gérer la ressource images de manière statique 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(express.json());
+
+
 // les routes attendues par le frontend //
 
 app.use('/api/user', userRoutes);
 app.use('/api/post', postRoutes);
 app.use('/api/comment', commentRoutes);
+
 
 
 

@@ -34,8 +34,7 @@
     "password-validator": "^5.2.1",
     "path": "^0.12.7",
     "sequelize": "^6.17.0",
-    "sequelize-cli": "^6.4.1",
-    "sql": "^0.78.0"
+    "sequelize-cli": "^6.4.1"
   },
   "devDependencies": {
     "eslint": "^8.10.0",

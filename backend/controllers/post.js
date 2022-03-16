@@ -13,14 +13,14 @@ exports.createPost = (req, res) => {
 
   // Permet de vérifier que tous les champs sont complétés
   if (content == null || content == "") {
-    res
+  return  res
       .status(400)
       .json({ error: "Tous les champs doivent être renseignés" });
   }
 
   // Permet de contrôler la longueur du titre et du contenu du message
   if (content.length <= 4) {
-    res
+  return  res
       .status(400)
       .json({
         error: "Le contenu du message doit contenir au moins 4 caractères",
@@ -51,7 +51,7 @@ exports.createPost = (req, res) => {
               .json({ error: "Une erreur s'est produite !" })
           );
       } else {
-        res.status(404).json({ error: "Utilisateur non trouvé" });
+      return  res.status(404).json({ error: "Utilisateur non trouvé" });
       }
     })
     .catch(() =>
@@ -66,23 +66,19 @@ exports.getAllPosts = (req, res) => {
     include: [
       {
         model: db.User,
-        attributes: ["username", "imageUrl"],
+        attributes: ["username"],
       },
-      {
-        model: db.Comment,
-      },
+
     ],
   })
     .then((postFound) => {
-      if (postFound) {
+      if (postFound)  {
         res.status(200).json(postFound);
       } else {
         res.status(404).json({ error: "Aucun message trouvé" });
-      }
-    })
-    .catch(() => {
-      res.status(500).send({ error: "Une erreur s'est produite !" });
-    });
+      }}
+)
+
 };
 
 // Permet de modifier un message
@@ -169,7 +165,7 @@ exports.deletePost = (req, res) => {
             );
         }
       } else {
-      res.status(404).json({ error: "Message non trouvé" });
+      return res.status(404).json({ error: "Message non trouvé" });
       }
     })
     .catch(() =>
