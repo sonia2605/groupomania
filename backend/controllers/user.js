@@ -97,7 +97,7 @@ exports.login = (req, res) => {
       if (user) {
         const isValid = await bcrypt.compare(req.body.password, user.password);
         if (!isValid) {
-          res.status(401).json({ error: "Mot de passe incorrect" });
+        return  res.status(401).json({ error: "Mot de passe incorrect" });
         }
 
         res.status(200).json({
@@ -132,50 +132,26 @@ exports.getUserProfile = (req, res) => {
         return  res.status(404).json({ error: 'Utilisateur non trouvé' })
       }
   })
-  .catch(error => res.status(404).json({ error: "erreur serveur"}));
+  .catch(error => res.status(404).json({ error: error}));
 }
+
 
 // Permet à un utilisateur de modifier son profil
 exports.modifyUserProfile = (req, res) => {
   const token = req.headers.authorization.split(" ")[1];
   const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
   const userId = decodedToken.userId;
-
   req.body.user = userId;
 
-  console.log("bodyUser", req.body.user);
-  const userObject = req.file 
-  /* ? {
-        ...JSON.parse(req.body.user),
-        imageUrl: `${req.protocol}://${req.get("host")}/images/${
-          req.file.filename
-        }`,
-      }
-    : { ...req.body };*/
-
-  db.User.findOne({
-    where: { id: userId },
-  })
-    .then((userFound) => {
-      if (userFound) {
-        db.User.update(userObject, {
-          where: { id: userId },
-        })
-          .then((user) =>
-            res.status(200).json({ message: "Profil modifié avec succès !" })
-          )
-          .catch(() =>
-            res.status(400).json({ error: "Une erreur s'est produite !" })
-          );
-      } else {
-        res.status(404).json({ error: "Utilisateur non trouvé" });
-      }
-    })
-    .catch(() =>
-      res.status(500).json({ error: "Une erreur s'est produite !" })
-    );
-};
-
+  db.User.update ({
+  email: req.body.email},
+  {where : {
+    id:(req.params.id)
+  }});
+  return res.status(200).send ({
+    message: "Email modifié avec succès"})
+  }
+ 
 // Permet à un utilisateur de supprimer son compte
 exports.deleteAccount = (req, res) => {
   const id = req.params.id;

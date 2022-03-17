@@ -4,7 +4,7 @@ const db = require("../models/index");
 const fs = require("fs");
 
 // Permet de créer un nouveau message
-exports.createPost = (req, res) => {
+exports.createPost = (req, res, next) => {
   const content = req.body.content;
 
   const token = req.headers.authorization.split(" ")[1];
@@ -13,31 +13,24 @@ exports.createPost = (req, res) => {
 
   // Permet de vérifier que tous les champs sont complétés
   if (content == null || content == "") {
-  return  res
+    return res
       .status(400)
       .json({ error: "Tous les champs doivent être renseignés" });
   }
 
   // Permet de contrôler la longueur du titre et du contenu du message
   if (content.length <= 4) {
-  return  res
-      .status(400)
-      .json({
-        error: "Le contenu du message doit contenir au moins 4 caractères",
-      });
+    return res.status(400).json({
+      error: "Le contenu du message doit contenir au moins 4 caractères",
+    });
   }
-
   db.User.findOne({
     where: { id: userId },
   })
-
     .then((userFound) => {
       if (userFound) {
         const post = db.Post.build({
           content: req.body.content,
-          imageUrl: req.file
-            ? `${req.protocol}://${req.get("host")}/images/${req.file.filename}`
-            : req.body.imageUrl,
           UserId: userFound.id,
         });
         post
@@ -45,130 +38,58 @@ exports.createPost = (req, res) => {
           .then(() =>
             res.status(201).json({ message: "Votre message a bien été créé !" })
           )
-          .catch(() =>
+          .catch((error) =>
             res
               .status(400)
               .json({ error: "Une erreur s'est produite !" })
           );
       } else {
-      return  res.status(404).json({ error: "Utilisateur non trouvé" });
+        return res.status(404).json({ error: "Utilisateur non trouvé" });
       }
     })
-    .catch(() =>
-      res.status(500).json({ error: "Une erreur s'est produite !" })
+    .catch((error) =>
+      res.status(500).json({ error: "erreur serveur" })
     );
 };
 
 // Permet d'afficher tous les messages
 exports.getAllPosts = (req, res) => {
   db.Post.findAll({
-    order: [["createdAt", "DESC"]],
-    include: [
-      {
-        model: db.User,
-        attributes: ["username"],
-      },
-
-    ],
+      order: [['createdAt', "DESC"]] ,
+      include: [{
+          model: db.User,
+          attributes: ['username']
+      },]
   })
-    .then((postFound) => {
-      if (postFound)  {
-        res.status(200).json(postFound);
-      } else {
-        res.status(404).json({ error: "Aucun message trouvé" });
-      }}
-)
+  .then(postFound => {
+        return  res.status(200).json(postFound);
+  })
+  .catch(error => {
+      res.status(500).send({ error: 'Une erreur s\'est produite !' });
+  });
+}
 
-};
-
-// Permet de modifier un message
+// Permet de modifier un message)
 exports.modifyPost = (req, res) => {
-  console.log("file", req.file);
-  console.log("content", req.body.content);
-  console.log("bodypost", req.body.post);
-  const postObject = req.file
-    ? {
-        content: req.body.content,
-        imageUrl: `${req.protocol}://${req.get("host")}/images/${
-          req.file.filename
-        }`,
-      }
-    : { ...req.body };
 
-  console.log("body", req.body);
-  console.log(req.params.postId);
-
-  db.Post.findOne({
-    where: { id: req.params.postId },
-  })
-    .then((postFound) => {
-      if (postFound) {
-        db.Post.update(postObject, {
-          where: { id: req.params.postId },
-        })
-          .then((post) =>
-            res
-              .status(200)
-              .json({ message: "Votre message a bien été modifié !" })
-          )
-          .catch(() =>
-            res
-              .status(400)
-              .json({ error: "Une erreur s'est produite !" })
-          );
-      } else {
-        res.status(404).json({ error: "Message non trouvé" });
-      }
-    })
-    .catch(() =>
+  db.Post.update({
+    content: req.body.content},
+    {where: { id: (req.params.postId)}})
+  return res.status(200)
+              .send({ message: "Votre message a bien été modifié !" })
+          
+    .catch((error) =>
       res.status(500).json({ error: "Une erreur s'est produite !" })
     );
 };
 
 // Permet de supprimer un message
-exports.deletePost = (req, res) => {
-  db.Post.findOne({
-    attributes: ["id"],
-    where: { id: req.params.postId },
-  })
-    .then((post) => {
-      if (post) {
-        if (post.imageUrl != null) {
-          const filename = post.imageUrl.split("/images/")[1];
-
-          fs.unlink(`images/${filename}`, () => {
-            db.Post.destroy({
-              where: { id: req.params.postId },
-            })
-              .then(() =>
-                res
-                  .status(200)
-                  .json({ message: "Votre message a été supprimé" })
-              )
-              .catch(() =>
-                res
-                  .status(500)
-                  .json({ error: "Une erreur s'est produite !" })
-              );
-          });
-        } else {
-          db.Post.destroy({
-            where: { id: req.params.postId },
-          })
-            .then(() =>
-              res.status(200).json({ message: "Votre message a été supprimé" })
-            )
-            .catch(() =>
-              res
-                .status(500)
-                .json({ error: "Une erreur s'est produite !" })
-            );
-        }
-      } else {
-      return res.status(404).json({ error: "Message non trouvé" });
-      }
-    })
-    .catch(() =>
-      res.status(500).json({ error: "Une erreur s'est produite !" })
-    );
+exports.deletePost = (req, res, next) => {
+// nous utilisons l'ID que nous recevons comme paramètre pour accéder au post correspondant dans la base de données 
+db.Post.findOne ({ 
+where: { id: req.params.postId }})          
+db.Post.destroy({where:{id: req.params.postId }})
+.then(() => res.status(200).json({ message: 'post supprimé !'}))
+.catch(error => res.status(400).json({ error: "Une erreur s'est produite" }));        
 };
+ 

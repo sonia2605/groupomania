@@ -5,18 +5,65 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class Comment extends Model {
     static associate(models) {
-      models.Comment.belongsTo(models.User, {
+      Comment.belongsTo(models.User, {
         foreignKey: 'userId'
       })
-      models.Comment.belongsTo(models.Post, {
+      Comment.belongsTo(models.Post, {
         foreignKey: 'postId'
       })
     }
   }
   Comment.init({
-    userId: DataTypes.INTEGER,
-    postId: DataTypes.INTEGER,
-    content: DataTypes.TEXT
+    id: {
+      type: DataTypes.INTEGER(11).UNSIGNED,
+      allowNull:     false,
+      primaryKey:    true,
+      autoIncrement: true,
+    },
+    content: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Le contenu du commentaire ne peut pas être vide',
+        },
+        notEmpty: {
+          msg: 'Le contenu du commentaire ne peut pas être vide',
+        },
+        isValidLength(message) {
+          if (message.length > 200) {
+            throw new Error('Le contenu du commentaire ne peut pas dépasser 200 caractères');
+          }
+        },
+      }
+    },
+    userId: {
+      type: DataTypes.INTEGER(11).UNSIGNED,
+      allowNull: false,
+    },
+    postId: {
+      type: DataTypes.INTEGER(11).UNSIGNED,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Le postId ne peut pas être vide',
+        },
+        notEmpty: {
+          msg: 'Le postId ne peut pas être vide',
+        },
+        isInt: true
+      }
+    },
+ /* createdAt: {
+    timestamp: false
+      //field: 'created_at',
+      //type: sequelize.DATE,
+  },
+  updatedAt: {
+    timestamp:false
+     //field: 'updated_at',
+     //type: sequelize.DATE,
+  }*/
   }, {
     sequelize,
     modelName: 'Comment',
