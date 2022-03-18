@@ -14,6 +14,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Comment.init({
+    postId: DataTypes.INTEGER,
+    userId: DataTypes.INTEGER,
+    content: DataTypes.STRING
+  /*
+  Comment.init({
     id: {
       type: DataTypes.INTEGER(11).UNSIGNED,
       allowNull:     false,
@@ -54,16 +59,7 @@ module.exports = (sequelize, DataTypes) => {
         isInt: true
       }
     },
- /* createdAt: {
-    timestamp: false
-      //field: 'created_at',
-      //type: sequelize.DATE,
-  },
-  updatedAt: {
-    timestamp:false
-     //field: 'updated_at',
-     //type: sequelize.DATE,
-  }*/
+*/
   }, {
     sequelize,
     modelName: 'Comment',

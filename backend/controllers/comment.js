@@ -28,19 +28,27 @@ exports.createComment = (req, res, next) => {
   .catch(error => res.status(500).json({ error: 'Une erreur s\'est produite !' }));
 }
 
-exports.getAllComments = (req, res, next) => {
-    model.Comment.findAll({
-        include:[{
-            model:db.Post,
-            model:db.User,
-            attributes: [ 'username' ]
-        }],
-         where: { postId: req.params.postId}
-        })
-    .then(comment => res.status(200).json(comment))
-    .catch(error => res.status(500).json(error, "Une erreur s'est produite"))
-    
-};
+// Permet d'afficher tous les commentaires
+exports.getAllComments = (req, res) => {
+    db.Comment.findAll({
+        //order: [['updatedAt', "ASC"], ['createdAt', "ASC"]],
+        where: { postId: req.params.postId },
+        include: [{
+            model: db.User,
+        }]
+    })
+    .then(commentFound => {
+        if(commentFound) {
+            res.status(200).json(commentFound);
+            console.log(commentFound);
+        } else {
+            res.status(404).json({ error: 'Aucun commentaire trouvé' });
+        }
+    })
+    .catch(error => {
+        res.status(500).send({ error: 'Une erreur s\'est produite !' });
+    });
+}
 
 
 exports.deleteComment = (req, res) => {
