@@ -3,13 +3,13 @@ const jwt = require("jsonwebtoken");
 const db = require("../models/index");
 
 // Permet de créer un nouveau commentaire
-exports.createComment = (req, res, next) => {    
+exports.createComment = (req, res) => {    
   const token = req.headers.authorization.split(' ')[1];
   const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
   const userId = decodedToken.userId;
   
   db.Post.findOne({
-      where: { id: req.params.postId }
+    where: { id: req.body.postId }
   })
   .then(postFound => {
       if(postFound) {
@@ -25,28 +25,25 @@ exports.createComment = (req, res, next) => {
           return res.status(404).json({ error: 'Message non trouvé'})
       }
   })
-  .catch(error => res.status(500).json({ error: 'Une erreur s\'est produite !' }));
+  .catch(error => res.status(500).json({ error: error }));
 }
 
 // Permet d'afficher tous les commentaires
 exports.getAllComments = (req, res) => {
     db.Comment.findAll({
-        //order: [['updatedAt', "ASC"], ['createdAt', "ASC"]],
+        order: [['updatedAt', "ASC"], ['createdAt', "ASC"]],
         where: { postId: req.params.postId },
         include: [{
             model: db.User,
         }]
     })
     .then(commentFound => {
-        if(commentFound) {
-            res.status(200).json(commentFound);
-            console.log(commentFound);
-        } else {
-            res.status(404).json({ error: 'Aucun commentaire trouvé' });
-        }
+        return res.status(200).json(commentFound);
+                
     })
     .catch(error => {
         res.status(500).send({ error: 'Une erreur s\'est produite !' });
+        console.log(error);
     });
 }
 

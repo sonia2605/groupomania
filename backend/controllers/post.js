@@ -4,9 +4,8 @@ const db = require("../models/index");
 const fs = require("fs");
 
 // Permet de créer un nouveau message
-exports.createPost = (req, res, next) => {
+exports.createPost = (req, res) => {
   const content = req.body.content;
-
   const token = req.headers.authorization.split(" ")[1];
   const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
   const userId = decodedToken.userId;
@@ -32,12 +31,13 @@ exports.createPost = (req, res, next) => {
         const post = db.Post.build({
           content: req.body.content,
           UserId: userFound.id,
+          imagePost: req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}`: req.body.imagePost
         });
         post
           .save()
           .then(() =>
             res.status(201).json({ message: "Votre message a bien été créé !" })
-          )
+           )
           .catch((error) =>
             res
               .status(400)
@@ -68,7 +68,6 @@ exports.getAllPosts = (req, res) => {
       res.status(500).send({ error: 'Une erreur s\'est produite !' });
   });
 }
-
 // Permet de modifier un message)
 exports.modifyPost = (req, res) => {
 
@@ -85,11 +84,12 @@ exports.modifyPost = (req, res) => {
 
 // Permet de supprimer un message
 exports.deletePost = (req, res, next) => {
-// nous utilisons l'ID que nous recevons comme paramètre pour accéder au post correspondant dans la base de données 
-db.Post.findOne ({ 
-where: { id: req.params.postId }})          
-db.Post.destroy({where:{id: req.params.postId }})
-.then(() => res.status(200).json({ message: 'post supprimé !'}))
-.catch(error => res.status(400).json({ error: "Une erreur s'est produite" }));        
-};
+  // nous utilisons l'ID que nous recevons comme paramètre pour accéder au post correspondant dans la base de données 
+  db.Post.findOne ({ 
+  where: { id: req.params.postId }})          
+  db.Post.destroy({where:{id: req.params.postId }})
+  .then(() => res.status(200).json({ message: 'post supprimé !'}))
+  .catch(error => res.status(400).json({ error: "Une erreur s'est produite" }));        
+  };
+   
  
