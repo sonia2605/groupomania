@@ -78,7 +78,6 @@ export default {
           password: this.password,
         })
         .then(() => {
-          this.message = "Bienvenue";
           this.$router.push("/");
         })
         .catch(() => (this.error = "veuillez vérifier votre saisie"));

@@ -62,7 +62,7 @@ export default {
   },
 
   methods: {
-    // Permet de se connecter et de recharger la page sans que l'utilisateur soit déconnecté
+// Se connecter et recharger la page sans deconnexion utilisateur
     login() {
       axios
         .post("http://localhost:3000/api/user/login", {

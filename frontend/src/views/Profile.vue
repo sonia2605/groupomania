@@ -10,21 +10,26 @@
           <p class="profile__info__title">Pseudo</p>
           <div class="profile__info__text">{{ user.username }}</div>
 
-          <p class="profile__info__title">Email</p>
-          <div class="profile__info__text">{{ user.email }}</div>
-        </div>
-
-        <button @click="modifyProfile" class="profile__smallButton">
-          Enregister <i class="fas fa-check"></i>
-        </button>
+          <p class="profile__info__title"> Email</p>
+          <div class="profile__info__text"><!--{{ user.email }}</div>-->
+          <label for="email" class = "profile__info__text__change"></label>
+          <input
+          type="email"
+          id="mail" 
+          v-model="email"
+          name="mail"/>
+          </div>
+      <button v-on:click.prevent="ModifyProfile" class="profile__smallButton"
+      >Enregister <i class="fas fa-check"></i></button>
+      
       </div>
-
+</div>
       <ModaleDeleteAccount
         v-bind:revele="revele"
         v-bind:displayModale="displayModale"
       />
       <button class="profile__bigButton" v-on:click="displayModale">
-        Supprimer mon compte <i class="far fa-trash-alt"></i>
+        Supprimer mon compte <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
   </div>
@@ -32,18 +37,21 @@
 
 <script>
 import axios from "axios";
+import EmailVue from "@/components/ModifyProfile.vue";
 import Navbar from "@/components/Navbar.vue";
 import ModaleDeleteAccount from "@/components/ModaleDeleteAccount.vue";
 export default {
   name: "ProfileVue",
   components: {
     Navbar,
+    EmailVue,
     ModaleDeleteAccount,
   },
   data() {
     return {
       revele: false,
       user: "",
+      EmailVue: null,
     };
   },
   created() {
@@ -103,7 +111,12 @@ export default {
 			padding: 0.5rem;
 			width: 15rem;
 			}
-		}
+      input {
+      border: none;
+      &:focus {
+        outline: none;
+      }
+		}}
 		&__smallButton {
 			border: 2px solid #3f3d56;
 			border-radius: 25px;
