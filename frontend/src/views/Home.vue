@@ -53,14 +53,14 @@
 <script>
 import axios from "axios";
 export default {
-  name: "Home",
+  name: "HomeVue",
   data() {
     return {
       email: "",
       password: "",
     };
   },
-  
+
   methods: {
     // Permet de se connecter et de recharger la page sans que l'utilisateur soit déconnecté
     login() {
@@ -75,7 +75,7 @@ export default {
           localStorage.setItem("username", response.data.username);
           localStorage.setItem("isAdmin", response.data.isAdmin);
           this.$router.push("post");
-        })
+        });
     },
   },
 };
@@ -97,7 +97,7 @@ export default {
       display: flex;
       flex-direction: column-reverse;
     }
-  /*  &__picture {
+     &__picture {
       float: left;
       padding-top: 4rem;
       margin: 0 0 0 3rem;
@@ -109,7 +109,7 @@ export default {
         margin: auto;
         padding-top: 2rem;
       }
-    }*/
+    }
     &__form {
       display: flex;
       flex-direction: column;
@@ -159,7 +159,6 @@ export default {
         font-weight: bold;
         text-decoration: none;
         color: #e60a0a;
-        // color: #ff6363;
       }
     }
   }

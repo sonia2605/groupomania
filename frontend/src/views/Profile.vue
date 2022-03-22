@@ -35,7 +35,7 @@ import axios from "axios";
 import Navbar from "@/components/Navbar.vue";
 import ModaleDeleteAccount from "@/components/ModaleDeleteAccount.vue";
 export default {
-  name: "Profile",
+  name: "ProfileVue",
   components: {
     Navbar,
     ModaleDeleteAccount,
@@ -73,80 +73,66 @@ export default {
 </script>
 
 <style scoped lang="scss">
-h1,
-h2 {
-  margin-top: 2rem;
-}
-.profile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 40%;
-  max-width: 60%;
-  margin: 3rem auto;
-  background: #ffb1b1;
-  border-radius: 25px;
-  @media (max-width: 500px) {
-    min-width: 80%;
-  }
-    &__modify__btnInvisible {
-      border: none;
-      background-color: #ffb1b1;
-      color: #3f3d56;
-      &:hover,
-      &:focus {
-        color: white;
-        cursor: pointer;
-      }
+	h1, h2 {
+	margin-top: 2rem;
+	}
+	.profile {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		min-width: 40%;
+		max-width: 60%;
+		margin: 3rem auto;
+		background: #ffb1b1;
+		border-radius: 25px;
+		@media (max-width: 500px) {
+			min-width: 80%;
     }
+		&__info {
+			display: flex;
+			flex-direction: column;
+			text-align: left;
+			margin: 1rem;
+			&__title {
+			font-weight: bold;
+			margin: 1rem 0 0.4rem 0;
+			}
+			&__text {
+			background: white;
+			border-radius: 10px;
+			padding: 0.5rem;
+			width: 15rem;
+			}
+		}
+		&__smallButton {
+			border: 2px solid #3f3d56;
+			border-radius: 25px;
+			color: #3f3d56;
+			font-size: 15px;
+			font-weight: bold;
+			padding: 0.4rem;
+			margin: 1rem;
+			outline-style: none;
+			background: white;
+			&:hover, &:focus {
+			color: #ff6363;
+			cursor: pointer;
+			}
+		}
+		&__bigButton {
+			border: 3px solid #3f3d56;
+			border-radius: 25px;
+			color: #3f3d56;
+			font-size: 15px;
+			font-weight: bold;
+			padding: 0.9rem;
+			margin: 1rem;
+			outline-style: none;
+			&:hover, &:focus {
+			border: 3px solid #ff6363;
+			color: #ff6363;
+			cursor: pointer;
+			}
+		}
   }
-  &__info {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    margin: 1rem;
-    &__title {
-      font-weight: bold;
-      margin: 1rem 0 0.4rem 0;
-    }
-    &__text {
-      background: white;
-      border-radius: 10px;
-      padding: 0.5rem;
-      width: 15rem;
-    }
-  }
-  &__smallButton {
-    border: 2px solid #3f3d56;
-    border-radius: 25px;
-    color: #3f3d56;
-    font-size: 15px;
-    font-weight: bold;
-    padding: 0.4rem;
-    margin: 1rem;
-    outline-style: none;
-    background: white;
-    &:hover,
-    &:focus {
-      color: #ff6363;
-      cursor: pointer;
-    }
-  }
-  &__bigButton {
-    border: 3px solid #3f3d56;
-    border-radius: 25px;
-    color: #3f3d56;
-    font-size: 15px;
-    font-weight: bold;
-    padding: 0.9rem;
-    margin: 1rem;
-    outline-style: none;
-    &:hover,
-    &:focus {
-      border: 3px solid #ff6363;
-      color: #ff6363;
-      cursor: pointer;
-    }
-  }
-
 </style>

@@ -1,18 +1,18 @@
- <template>
+<template>
   <div id="post">
     <Navbar />
 
     <h1 class="invisible">Fil d'actualité</h1>
 
     <div class="newPost">
-    <form @submit.prevent="createPost" aria-label="Nouveau message">
+      <form @submit.prevent="createPost" aria-label="Nouveau message">
         <div class="newPost__content">
           <textarea
             v-model="content"
             class="newPost__content__text"
             name="message"
             id="message"
-            placeholder="votre message ?"
+            placeholder="Quoi de neuf ?"
             aria-label="Rédiger un nouveau message"
           />
 
@@ -153,8 +153,6 @@
             alt="Image insérée dans le message"
           />
         </div>
-
-        <div class="displayPost__item__option">
           <div>
             <i
               @click="displayComment(post.id)"
@@ -197,13 +195,12 @@
             class="displayComment__item"
           >
             <div class="displayComment__item__information">
-              <div class="displayComment__item__information__user">
-                <h2 class="displayComment__item__information__user__name">
-                  {{ comment.User.username }}
-                </h2>
-              </div>
+            <div class="displayComment__item__information__user">
+            <h2 class="displayComment__item__information__user__name">
+            {{ comment.User.username }}
+            </h2>
 
-              <div>
+            <div>
                 <span class="displayPost__item__information__date"
                   >Publié le {{ dateFormat(comment.createdAt) }}</span
                 >
@@ -268,9 +265,9 @@ import moment from "moment";
 
 import Navbar from "@/components/Navbar.vue";
 export default {
-  name: "Post",
+  name: "PostVue",
   components: {
-    Navbar
+    Navbar,
   },
   data() {
     return {
@@ -317,9 +314,11 @@ export default {
         .then(() => {
           window.location.reload();
         })
-    },
-
-    // Permet d'afficher tous les messages
+        .catch((error) => (this.msgError = error));
+        this.image = "";
+        this.content = "";    
+},          
+// Permet d'afficher tous les messages
     displayPost() {
       axios
         .get("http://localhost:3000/api/post", {
@@ -332,13 +331,13 @@ export default {
           this.posts = response.data;
         })
     },
-    // Permet d'afficher la date de publication au bon format
+// Permet d'afficher la date de publication au bon format
     dateFormat(date) {
       if (date) {
         return moment(String(date)).format("DD/MM/YYYY");
       }
     },
-    // Permet d'afficher le champ pour modifier un message
+// Permet d'afficher le champ pour modifier un message
     displayModifyPost(id) {
       const postId = id;
       this.showInputModify == false;
@@ -369,7 +368,7 @@ export default {
         this.showInputModify = !this.showInputModify;
       }
     },
-    // Permet de modifier un message
+// Permet de modifier un message
     modifyPost(id) {
       const postId = id;
       const formData = new FormData();

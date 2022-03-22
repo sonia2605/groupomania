@@ -60,7 +60,7 @@
 <script>
 import axios from "axios";
 export default {
-  name: "Signup",
+  name: "SignupVue",
   data() {
     return {
       username: "",
@@ -78,11 +78,10 @@ export default {
           password: this.password,
         })
         .then(() => {
-          this.notyf.success(
-            "Votre compte a bien été créé ! A présent, veuillez vous connecter."
-          );
+          this.message = "Bienvenue";
           this.$router.push("/");
         })
+        .catch(() => (this.error = "veuillez vérifier votre saisie"));
     },
   },
 };
@@ -166,7 +165,6 @@ export default {
         font-weight: bold;
         text-decoration: none;
         color: #e60a0a;
-        // color: #ff6363;
       }
     }
   }
