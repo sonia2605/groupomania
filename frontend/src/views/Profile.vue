@@ -2,43 +2,43 @@
   <div>
     <Navbar />
     <div>
+      
       <h1 v-if="user">Bienvenue {{ user.username }} !</h1>
 
       <div class="profile">
-        <h2>Vos informations</h2>
-        <div class="profile__info">
-          <p class="profile__info__title">Pseudo</p>
-          <div class="profile__info__text">{{ user.username }}</div>
+      <h2>Vos informations</h2>
 
-          <p class="profile__info__title"> Email</p>
-          <div class="profile__info__text"><!--{{ user.email }}</div>-->
-          <label for="email" class = "profile__info__text__change"></label>
-          <input
-          type="email"
-          id="mail" 
-          v-model="email"
-          name="mail"/>
-          </div>
-      <button v-on:click.prevent="ModifyProfile" class="profile__smallButton"
-      >Enregister <i class="fas fa-check"></i></button>
-      
-      </div>
+      <div class="profile__info">
+      <p class="profile__info__title">Pseudo</p>
+      <div class="profile__info__text">{{ user.username }}</div>
+
+      <p class="profile__info__title"> Email</p>
+      <div class="profile__info__text"
+      v-if="!modePassword" 
+      @click="swithTo()">{{user.email}}
+    </div>
+    <EmailVue>
 </div>
+  <button @click="modifyProfile" class="profile__smallButton"
+   >Enregister <i class="fas fa-check"></i></button>
+</div>
+
+</div>
+
       <ModaleDeleteAccount
         v-bind:revele="revele"
         v-bind:displayModale="displayModale"
-      />
+      /> 
       <button class="profile__bigButton" v-on:click="displayModale">
         Supprimer mon compte <i class="fa-solid fa-xmark"></i>
       </button>
-    </div>
-  </div>
+</div>
 </template>
 
 <script>
 import axios from "axios";
-import EmailVue from "@/components/ModifyProfile.vue";
 import Navbar from "@/components/Navbar.vue";
+import EmailVue from "@/components/ModifyProfile.vue";
 import ModaleDeleteAccount from "@/components/ModaleDeleteAccount.vue";
 export default {
   name: "ProfileVue",
@@ -51,7 +51,7 @@ export default {
     return {
       revele: false,
       user: "",
-      EmailVue: null,
+
     };
   },
   created() {
@@ -69,6 +69,7 @@ export default {
         })
         .then((response) => {
           this.user = response.data;
+          this.email = response.data;
         })
     },
         
