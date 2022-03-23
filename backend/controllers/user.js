@@ -177,3 +177,18 @@ exports.deleteAccount = (req, res) => {
       res.status(500).json({ error: "Une erreur s'est produite !" })
     );
 };
+exports.me =(res, req) => {
+  const token = req.headers.authorization.split(" ")[1];
+  const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
+  const userId = decodedToken.userId;
+  //vérifier que le userId existe et le renvoyer sinon erreur
+  const id = req.params.id;
+  db.User.findOne({
+      where: { id: id }
+  })
+  .then (() => res.status(200).json ({
+    userId: user.id,
+  }))
+  .catch (() => 
+   res.status(404).json) ({error: "userId non trouvé"});
+};

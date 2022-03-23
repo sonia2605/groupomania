@@ -55,7 +55,7 @@ exports.createPost = (req, res) => {
 // Permet d'afficher tous les messages
 exports.getAllPosts = (req, res) => {
   db.Post.findAll({
-      order: [['createdAt', "DESC"]] ,
+      //order: [['createdAt', "DESC"]] ,
       include: [{
           model: db.User,
           attributes: ['username']
