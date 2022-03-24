@@ -36,6 +36,8 @@
 
 <script>
 import axios from "axios";
+import { Notyf } from 'notyf'
+import 'notyf/notyf.min.css'
 import Navbar from "@/components/Navbar.vue";
 import ModaleDeleteAccount from "@/components/ModaleDeleteAccount.vue";
 
@@ -53,7 +55,15 @@ export default {
   },
   created() {
     this.displayProfile();
-  },
+			this.notyf = new Notyf({
+			duration: 2000,
+			position: {
+				x: 'center',
+				y: 'top'
+			}
+			}); 
+		},
+  
   methods: {
     // Permet d'afficher les informations de profil
     displayProfile() {
@@ -66,9 +76,12 @@ export default {
         })
         .then((response) => {
           this.user = response.data;
-        });
-    },
-
+	})
+				.catch(error => {
+					const msgerror = error.response.data
+					this.notyf.error(msgerror.error)
+				})
+			},
     // Permet d'afficher la boîte modale pour la suppression du compte
     displayModale() {
       this.revele = !this.revele;

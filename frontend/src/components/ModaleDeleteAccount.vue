@@ -23,9 +23,20 @@
 
 <script>
 import axios from "axios";
+import { Notyf } from "notyf";
+import "notyf/notyf.min.css";
 export default {
   name: "ModaleDeleteAccount",
   props: ["revele", "displayModale"],
+  created() {
+    this.notyf = new Notyf({
+      duration: 2000,
+      position: {
+        x: "center",
+        y: "bottom",
+      },
+    });
+  },
   methods: {
     // Permet de supprimer le compte
     deleteAccount() {
@@ -38,9 +49,14 @@ export default {
           },
         })
         .then(() => {
+          this.notyf.success("Votre compte a bien été supprimé");
           localStorage.clear();
           this.$router.push("/");
         })
+        .catch((error) => {
+          const msgerror = error.response.data;
+          this.notyf.error(msgerror.error);
+        });
     },
   },
 };

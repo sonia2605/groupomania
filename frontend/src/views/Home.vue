@@ -1,11 +1,13 @@
 <template>
   <div class="home">
+    <!-- titre page d'accueil -->
     <img
       class="home__title"
       src="../assets/iconLong450.png"
       alt="Logo de Groupomania"
     />
 
+    <!-- Iamge d'accueil -->
     <div class="home__display">
       <div class="home__display__picture">
         <img
@@ -15,14 +17,16 @@
         />
       </div>
 
+      <!-- formulaire de connexion -->
       <form @submit.prevent="login" class="home__display__form">
         <h1 class="home__display__form__title">Se connecter</h1>
+        <p>Renseignez tous les champs</p>
 
         <div class="home__display__form__input">
           <label for="mail" class="home__display__form__input__label"
             >Email</label
           >
-          <input type="email" v-model="email" id="mail" name="mail" />
+          <input type="email" v-model="email" id="mail" name="mail"/>
         </div>
 
         <div class="home__display__form__input">
@@ -52,6 +56,8 @@
 
 <script>
 import axios from "axios";
+import { Notyf } from "notyf";
+import "notyf/notyf.min.css";
 export default {
   name: "HomeVue",
   data() {
@@ -60,7 +66,15 @@ export default {
       password: "",
     };
   },
-
+  created() {
+    this.notyf = new Notyf({
+      duration: 2000,
+      position: {
+        x: "center",
+        y: "bottom",
+      },
+    });
+  },
   methods: {
 // Se connecter et recharger la page sans deconnexion utilisateur
     login() {
@@ -71,7 +85,15 @@ export default {
         })
         .then((response) => {
           localStorage.setItem("token", response.data.token);
+          localStorage.setItem('userId', response.data.userId);
+          localStorage.setItem('username', response.data.username);
+          localStorage.setItem('isAdmin', response.data.isAdmin);
+          
           this.$router.push("post");
+        })
+        .catch(error => {
+        const msgerror = error.response.data
+        this.notyf.error(msgerror.error)
         });
     },
   },
@@ -94,7 +116,7 @@ export default {
       display: flex;
       flex-direction: column-reverse;
     }
-     &__picture {
+    &__picture {
       float: left;
       padding-top: 4rem;
       margin: 0 0 0 3rem;

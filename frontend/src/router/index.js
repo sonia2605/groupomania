@@ -12,12 +12,12 @@ const routes = [
   {
     path: '/signup',
     name: 'Signup',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Signup.vue')
+    component: () => import('../views/Signup.vue')
   },
   {
     path: '/post',
     name: 'Post',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Post.vue'),
+    component: () => import('../views/Post.vue'),
     meta: {
       middleware: auth
     }
@@ -25,7 +25,7 @@ const routes = [
   {
     path: '/profile',
     name: 'Profile',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Profile.vue'),
+    component: () => import('../views/Profile.vue'),
     meta: {
       middleware: auth
     }
@@ -33,9 +33,13 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(),
-  routes
-})
+  history: createWebHashHistory(process.env.BASE_URL),
+  routes,
+  scrollBehavior() {
+// Permet de revenir à la position initiale de la page
+    window.scrollTo(0, 0);
+  },
+});
 
 router.beforeEach(VueRouteMiddleware())
 

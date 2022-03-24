@@ -14,22 +14,35 @@
           alt="Représentation de trois personnes qui discutent via un chat"
         />
       </div>
-
+      <!-- Formulaire d' inscription -->
       <form @submit.prevent="signup" class="home__display__form">
         <h1 class="home__display__form__title">S'inscrire</h1>
+        <p>Veuillez renseignez tous les champs</p>
 
         <div class="home__display__form__input">
           <label for="username" class="home__display__form__input__label"
             >Pseudo</label
           >
-          <input type="text" v-model="username" id="username" name="username" />
+          <input
+            type="text"
+            v-model="username"
+            id="username"
+            name="username"
+            placeholder="Minimum 3 caractères"
+          />
         </div>
 
         <div class="home__display__form__input">
           <label for="mail" class="home__display__form__input__label"
             >Email</label
           >
-          <input type="email" v-model="email" id="mail" name="mail" />
+          <input
+            type="email"
+            v-model="email"
+            id="mail"
+            name="mail"
+            placeholder="Renseignez une adresse valide"
+          />
         </div>
 
         <div class="home__display__form__input">
@@ -41,6 +54,7 @@
             v-model="password"
             id="password"
             name="password"
+            placeholder="Au moins 3 MAJ, 3 min, 2 chiffres"
           />
         </div>
 
@@ -59,6 +73,8 @@
 
 <script>
 import axios from "axios";
+import { Notyf } from "notyf";
+import "notyf/notyf.min.css";
 export default {
   name: "SignupVue",
   data() {
@@ -67,6 +83,15 @@ export default {
       email: "",
       password: "",
     };
+  },
+  created() {
+    this.notyf = new Notyf({
+      duration: 4000,
+      position: {
+        x: "center",
+        y: "bottom",
+      },
+    });
   },
   methods: {
     // Permet de s'inscrire pour aller sur la page de connexion
@@ -78,9 +103,15 @@ export default {
           password: this.password,
         })
         .then(() => {
+          this.notyf.success(
+            "Compte créé avec succès ! veuillez vous connecter."
+          );
           this.$router.push("/");
         })
-        .catch(() => (this.error = "veuillez vérifier votre saisie"));
+        .catch((error) => {
+          const msgerror = error.response.data;
+          this.notyf.error(msgerror.error);
+        });
     },
   },
 };
