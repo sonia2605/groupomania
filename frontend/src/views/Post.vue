@@ -6,7 +6,7 @@
 
     <div class="newPost">
 
-
+<!--formulaire de saisie de messages -->
       <form @submit.prevent="createPost" aria-label="Nouveau message">
         <div class="newPost__content">
           <textarea
@@ -17,7 +17,7 @@
             placeholder="Que voulez-vous dire ?"
             aria-label="Rédiger un nouveau message"/>
         </div>
-
+<!-- bouton d'importation fichiers -->
         <div class="newPost__option">
           <div class="newPost__option__file">
             <button
@@ -43,7 +43,7 @@
           >
             Publier <i class="far fa-paper-plane"></i>
           </button>
-        </div>
+        </div> 
       </form>
     </div>
 
@@ -51,19 +51,20 @@
       <div class="displayPost__item">
         <div class="displayPost__item__information">
           <div class="displayPost__item__information__user">
-            <h2 class="displayPost__item__information__user__name">
-              {{ post.User.username }}
+           <h2 class="displayPost__item__information__user__name">
+              {{ post.User }}
             </h2>
           </div>
-
+        </div>
+        console.log(post.User.username);
+<!--date de publication du message-->
           <div>
             <span class="displayPost__item__information__date"
-              >Publié le {{ dateFormat(post.createdAt) }}</span
-            >
+              >Publié le {{ dateFormat(post.createdAt) }}</span>
           </div>
-        </div>
 
-        <div class="displayPost__item__publication">
+
+       <div class="displayPost__item__publication">
           <p
             :contentPostId="post.id"
             style="display: block"
@@ -96,6 +97,7 @@
                   @click="uploadFile"
                   type="button"
                   class="displayPost__item__publication__text__modifyText__option__file__btnInvisible"
+                
                 >
                   <i class="far fa-images fa-2x"></i> Choisir un fichier
                 </button>
@@ -124,13 +126,6 @@
               class="displayPost__item__publication__image"
               alt="Image insérée dans le message"
             />
-
-           <!-- <img
-              v-if="imagePreview"
-              :src="imagePreview"
-              class="newPost__content__image"
-              alt="Prévisualisation de l'image ajoutée au message modifié"
-            />-->
           </div>
 
           <img
@@ -143,7 +138,7 @@
           />
         </div>
 
-          <div>
+          <div class ="displayPost__item__option">
             <i
               @click="displayComment(post.id)"
               v-on:click="diplayCreateComment(post.id)"
@@ -171,10 +166,8 @@
             aria-label="Supprimer le message"
           ></i>
         </div>
-      </div>
 
-      <div>
-        <div
+      <!--<div
           class="displayComment"
           v-for="comment in comments"
           :key="comment.commentId"
@@ -186,8 +179,7 @@
           >
             <div class="displayComment__item__information">
               <div class="displayComment__item__information__user">
-
-                <h2 class="displayComment__item__information__user__name">
+               <h2 class="displayComment__item__information__user__name">
                   {{ comment.User.username }}
                 </h2>
               </div>
@@ -213,10 +205,10 @@
               ></i>
             </div>
           </div>
-        </div>
+          </div>
 
-        <div
-          :formId="post.id"
+
+        <div  :formId="post.id"
           style="display: none"
           v-bind:showCreateComment="showCreateComment"
           class="displayComment__newComment"
@@ -243,11 +235,9 @@
               </button>
             </div>
           </form>
+        </div>-->
         </div>
-      </div>
-    </div>
-
-
+</div>
 </template>
 
 <script>
@@ -301,11 +291,12 @@ export default {
       this.imagePost = event.target.files[0];
        this.imagePreview = URL.createObjectURL(this.imagePost);
     },
-    createPost() {
+     async createPost() {
       const formData = new FormData();
       formData.append("content", this.content);
+      formData.append("userId", this.userId);
       formData.append("image", this.imagePost);
-      axios
+     await axios
         .post("http://localhost:3000/api/post", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
