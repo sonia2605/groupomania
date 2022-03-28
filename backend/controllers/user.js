@@ -143,6 +143,22 @@ exports.modifyUserProfile = (req, res) => {
   const userId = decodedToken.userId;
   req.body.user = userId;
 
+  const userObject = req.file ?
+  {
+    ...JSON.parse(req.body.user)
+  }: {...req.body};
+
+  db.User.findOne({
+    where: { id: userId}, 
+  })
+  .then(userFound => {
+    if(userFound) {
+      db.User.update(userObject, {
+        where: {id: userId}
+      })
+    }
+  })
+
   db.User.update ({
   email: req.body.email},
   {where : {

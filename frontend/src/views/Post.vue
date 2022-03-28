@@ -5,6 +5,8 @@
     <h1 class="invisible">Fil d'actualité</h1>
 
     <div class="newPost">
+
+
       <form @submit.prevent="createPost" aria-label="Nouveau message">
         <div class="newPost__content">
           <textarea
@@ -12,20 +14,8 @@
             class="newPost__content__text"
             name="message"
             id="message"
-            placeholder="votre message ?"
-            aria-label="Rédiger un nouveau message"
-          />
-
-          <div id="preview" style="display: block">
-            <img
-              v-if="imagePreview"
-              :src="imagePreview"
-              id="preview"
-              style="display: block"
-              class="newPost__content__image"
-              alt="Prévisualisation de l'image ajoutée au message"
-            />
-          </div>
+            placeholder="Que voulez-vous dire ?"
+            aria-label="Rédiger un nouveau message"/>
         </div>
 
         <div class="newPost__option">
@@ -33,8 +23,7 @@
             <button
               @click="uploadFile"
               type="button"
-              class="newPost__option__file__btnInvisible"
-            >
+              class="newPost__option__file__btnInvisible">
               <i class="far fa-images fa-2x"></i> Choisir un fichier
             </button>
 
@@ -130,18 +119,18 @@
             </div>
 
             <img
-              v-if="post.imagePost && !imagePreview"
+              v-if="post.imagePost"
               :src="post.imagePost"
               class="displayPost__item__publication__image"
               alt="Image insérée dans le message"
             />
 
-            <img
+           <!-- <img
               v-if="imagePreview"
               :src="imagePreview"
               class="newPost__content__image"
               alt="Prévisualisation de l'image ajoutée au message modifié"
-            />
+            />-->
           </div>
 
           <img
@@ -154,7 +143,6 @@
           />
         </div>
 
-        <div class="displayPost__item__option">
           <div>
             <i
               @click="displayComment(post.id)"
@@ -198,6 +186,7 @@
           >
             <div class="displayComment__item__information">
               <div class="displayComment__item__information__user">
+
                 <h2 class="displayComment__item__information__user__name">
                   {{ comment.User.username }}
                 </h2>
@@ -258,20 +247,23 @@
       </div>
     </div>
 
-    <router-view />
-  </div>
+
 </template>
 
 <script>
 import axios from "axios";
 import moment from "moment";
+import { Notyf } from "notyf";
+import "notyf/notyf.min.css";
+
 import Navbar from "@/components/Navbar.vue";
+
 export default {
   name: "PostVue",
   components: {
     Navbar,
   },
-  data() {
+  data () {
     return {
       userId: localStorage.getItem("userId"),
       username: localStorage.getItem("username"),
@@ -292,6 +284,13 @@ export default {
   },
   created() {
     this.displayPost();
+    this.notyf = new Notyf({
+      duration: 2000,
+      position: {
+        x: "center",
+        y: "top",
+      },
+    });
   },
   methods: {
     // Permet de créer un nouveau message
@@ -300,7 +299,7 @@ export default {
     },
     onFileSelected(event) {
       this.imagePost = event.target.files[0];
-      this.imagePreview = URL.createObjectURL(this.imagePost);
+       this.imagePreview = URL.createObjectURL(this.imagePost);
     },
     createPost() {
       const formData = new FormData();
@@ -315,8 +314,13 @@ export default {
         })
         .then(() => {
           window.location.reload();
+        })
+        .catch((error) => {
+          const msgerror = error.response.data;
+          this.notyf.error(msgerror.error);
         });
     },
+
     // Permet d'afficher tous les messages
     displayPost() {
       axios
@@ -328,6 +332,10 @@ export default {
         })
         .then((response) => {
           this.posts = response.data;
+        })
+        .catch((error) => {
+          const msgerror = error.response.data;
+          this.notyf.error(msgerror.error);
         });
     },
     // Permet d'afficher la date de publication au bon format
@@ -382,11 +390,16 @@ export default {
         })
         .then(() => {
           window.location.reload();
+        })
+        .catch((error) => {
+          const msgerror = error.response.data;
+          this.notyf.error(msgerror.error);
         });
     },
     // Permet de supprimer un message
     deletePost(id) {
       const postId = id;
+
       axios
         .delete("http://localhost:3000/api/post/" + postId, {
           headers: {
@@ -396,14 +409,20 @@ export default {
         })
         .then(() => {
           this.displayPost();
+        })
+        .catch((error) => {
+          const msgerror = error.response.data;
+          this.notyf.error(msgerror.error);
         });
     },
+
     // Permet d'afficher le champ pour créer un nouveau commentaire
     diplayCreateComment(id) {
       const postId = id;
       this.showCreateComment == false;
       let form = document.querySelector('div[formId="' + id + '"]');
       let formId = form.getAttribute("formId");
+
       if (postId == formId && this.showCreateComment == false) {
         form.style.display = "block";
         this.showCreateComment = !this.showCreateComment;
@@ -429,12 +448,17 @@ export default {
         )
         .then(() => {
           window.location.reload();
+        })
+        .catch((error) => {
+          const msgerror = error.response.data;
+          this.notyf.error(msgerror.error);
         });
     },
     // Permet d'afficher les commentaires d'un message
     displayComment(id) {
       this.showComment = !this.showComment;
       const postId = id;
+
       axios
         .get("http://localhost:3000/api/comment/" + postId, {
           headers: {
@@ -444,6 +468,10 @@ export default {
         })
         .then((response) => {
           this.comments = response.data;
+        })
+        .catch((error) => {
+          const msgerror = error.response.data;
+          this.notyf.error(msgerror.error);
         });
     },
     // Permet de supprimer un commentaire
@@ -458,6 +486,10 @@ export default {
         })
         .then(() => {
           window.location.reload();
+        })
+        .catch((error) => {
+          const msgerror = error.response.data;
+          this.notyf.error(msgerror.error);
         });
     },
   },
@@ -577,9 +609,6 @@ export default {
       &__user {
         display: flex;
         align-items: center;
-        &__photo {
-          margin: 0.5rem 0.5rem 0 0;
-        }
         &__name {
           margin-bottom: 0.2rem;
           font-size: 22px;
