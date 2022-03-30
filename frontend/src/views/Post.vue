@@ -1,4 +1,4 @@
-<template>
+ <template>
   <div id="post">
     <Navbar />
 
@@ -48,23 +48,25 @@
     </div>
 
     <div class="displayPost" v-for="post in posts" :key="post.postId">
-      <div class="displayPost__item">
-        <div class="displayPost__item__information">
-          <div class="displayPost__item__information__user">
-           <h2 class="displayPost__item__information__user__name">
-              {{ post.User }}
-            </h2>
-          </div>
-        </div>
-        console.log(post.User.username);
+     <div class="displayPost__item">
+       <div class="displayPost__item__information">
+         <div class="displayPost__item__information__user">
+         <h2 class="displayPost__item__information__user__name">
+              {{ post.User}}
+          </h2>
+          </div> 
+
+
 <!--date de publication du message-->
-          <div>
+        <div>
             <span class="displayPost__item__information__date"
               >Publié le {{ dateFormat(post.createdAt) }}</span>
-          </div>
+        </div>
+       
+</div>
 
-
-       <div class="displayPost__item__publication">
+    
+      <div class="displayPost__item__publication">
           <p
             :contentPostId="post.id"
             style="display: block"
@@ -72,62 +74,8 @@
           >
             {{ post.content }}
           </p>
-
-          <div
-            :inputId="post.id"
-            style="display: none"
-            v-bind:showInputModify="showInputModify"
-            class="displayPost__item__publication__text__modifyText"
-          >
-            <textarea
-              v-model="contentmodifyPost"
-              :placeholder="post.content"
-              id="textarea"
-              class="displayPost__item__publication__text__modifyText__textarea"
-              aria-label="Modifier le message"
-            />
-
-            <div
-              class="displayPost__item__publication__text__modifyText__option"
-            >
-              <div
-                class="displayPost__item__publication__text__modifyText__option__file"
-              >
-                <button
-                  @click="uploadFile"
-                  type="button"
-                  class="displayPost__item__publication__text__modifyText__option__file__btnInvisible"
-                
-                >
-                  <i class="far fa-images fa-2x"></i> Choisir un fichier
-                </button>
-
-                <input
-                  type="file"
-                  ref="fileUpload"
-                  @change="onFileSelected"
-                  accept="image/*"
-                  aria-label="Sélectionner un fichier"
-                />
-              </div>
-
-              <button
-                v-on:click="modifyPost(post.id)"
-                class="displayPost__item__publication__text__modifyText__option__button"
-                aria-label="Enregistrer les modifications"
-              >
-                Enregistrer <i class="fas fa-check"></i>
-              </button>
-            </div>
-
-            <img
-              v-if="post.imagePost"
-              :src="post.imagePost"
-              class="displayPost__item__publication__image"
-              alt="Image insérée dans le message"
-            />
-          </div>
-
+      </div>
+  
           <img
             v-if="post.imagePost"
             :imgPostId="post.id"
@@ -135,10 +83,11 @@
             :src="post.imagePost"
             class="displayPost__item__publication__image"
             alt="Image insérée dans le message"
-          />
-        </div>
+          />   
 
-          <div class ="displayPost__item__option">
+
+         <div class ="displayPost__item__option">
+           <div>
             <i
               @click="displayComment(post.id)"
               v-on:click="diplayCreateComment(post.id)"
@@ -150,14 +99,7 @@
               class="displayPost__item__option__count"
               >{{ post.Comments.length }}</span
             >
-          </div>
-
-          <i
-            v-if="userId == post.UserId || isAdmin == 'true'"
-            @click="displayModifyPost(post.id)"
-            class="displayPost__item__option__button far fa-edit"
-            aria-label="Modifier le message"
-          ></i>
+            </div>
 
           <i
             v-if="userId == post.UserId || isAdmin == 'true'"
@@ -167,7 +109,9 @@
           ></i>
         </div>
 
-      <!--<div
+
+
+      <div
           class="displayComment"
           v-for="comment in comments"
           :key="comment.commentId"
@@ -180,7 +124,7 @@
             <div class="displayComment__item__information">
               <div class="displayComment__item__information__user">
                <h2 class="displayComment__item__information__user__name">
-                  {{ comment.User.username }}
+                 {{ comment.User.username }}
                 </h2>
               </div>
 
@@ -207,7 +151,6 @@
           </div>
           </div>
 
-
         <div  :formId="post.id"
           style="display: none"
           v-bind:showCreateComment="showCreateComment"
@@ -222,7 +165,7 @@
               class="displayComment__newComment__form__text"
               name="comment"
               id="comment"
-              placeholder="Ecrivez votre commentaire ..."
+              placeholder="Votre commentaire ..."
               aria-label="Rédiger un nouveau commentaire"
             />
 
@@ -234,10 +177,13 @@
                 <i class="far fa-paper-plane"></i>
               </button>
             </div>
+     
           </form>
-        </div>-->
-        </div>
-</div>
+          
+          </div>
+     </div> 
+    </div>   
+  </div>
 </template>
 
 <script>
