@@ -1,12 +1,10 @@
  <template>
   <div id="post">
     <Navbar />
-
     <h1 class="invisible">Fil d'actualité</h1>
 
+<!--formulaire de saisie des messages -->
     <div class="newPost">
-
-<!--formulaire de saisie de messages -->
       <form @submit.prevent="createPost" aria-label="Nouveau message">
         <div class="newPost__content">
           <textarea
@@ -17,7 +15,7 @@
             placeholder="Que voulez-vous dire ?"
             aria-label="Rédiger un nouveau message"/>
         </div>
-<!-- bouton d'importation fichiers -->
+<!-- bouton d'importation du fichier -->
         <div class="newPost__option">
           <div class="newPost__option__file">
             <button
@@ -47,25 +45,25 @@
       </form>
     </div>
 
-    <div class="displayPost" v-for="post in posts" :key="post.postId">
+<!--Affichage des messages -->
+   <div class="displayPost" v-for="post in posts" :key="post.postId">
      <div class="displayPost__item">
        <div class="displayPost__item__information">
-         <div class="displayPost__item__information__user">
-         <h2 class="displayPost__item__information__user__name">
-              {{ post.User}}
+        <div class="displayPost__item__information__user">
+         <h2 v-if="post.User" class="displayPost__item__information__user__name">
+              {{ post.User.username}}
           </h2>
-          </div> 
-
+        </div>
 
 <!--date de publication du message-->
         <div>
             <span class="displayPost__item__information__date"
               >Publié le {{ dateFormat(post.createdAt) }}</span>
         </div>
-       
+    
+
 </div>
 
-    
       <div class="displayPost__item__publication">
           <p
             :contentPostId="post.id"
@@ -98,9 +96,10 @@
               v-if="post.Comments.length > 0"
               class="displayPost__item__option__count"
               >{{ post.Comments.length }}</span
+              
             >
-            </div>
 
+          </div>
           <i
             v-if="userId == post.UserId || isAdmin == 'true'"
             v-on:click="deletePost(post.id)"
@@ -108,9 +107,10 @@
             aria-label="Supprimer le message"
           ></i>
         </div>
+  
+</div>
 
-
-
+<div>
       <div
           class="displayComment"
           v-for="comment in comments"
@@ -119,12 +119,11 @@
           <div
             v-bind:showComment="showComment"
             v-if="showComment && post.id == comment.postId"
-            class="displayComment__item"
+            class="displayComment__item__information">
           >
-            <div class="displayComment__item__information">
-              <div class="displayComment__item__information__user">
-               <h2 class="displayComment__item__information__user__name">
-                 {{ comment.User.username }}
+            <div class="displayComment__item__information__user">
+               <h2 v-if="comment.User" class="displayComment__item__information__user__name">
+                 {{ comment.User.username}}
                 </h2>
               </div>
 
@@ -179,10 +178,10 @@
             </div>
      
           </form>
-          
           </div>
-     </div> 
-    </div>   
+</div>
+
+  <router-view/>
   </div>
 </template>
 
@@ -235,14 +234,14 @@ export default {
     },
     onFileSelected(event) {
       this.imagePost = event.target.files[0];
-       this.imagePreview = URL.createObjectURL(this.imagePost);
+      //this.imagePreview = URL.createObjectURL(this.imagePost);
     },
-     async createPost() {
+    createPost() {
       const formData = new FormData();
       formData.append("content", this.content);
-      formData.append("userId", this.userId);
+     // formData.append("userId", parseInt(localStorage.getItem("userId")));
       formData.append("image", this.imagePost);
-     await axios
+     axios
         .post("http://localhost:3000/api/post", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -264,7 +263,7 @@ export default {
         .get("http://localhost:3000/api/post", {
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
+            'Authorization': "Bearer " + localStorage.getItem("token"),
           },
         })
         .then((response) => {
@@ -281,11 +280,11 @@ export default {
         return moment(String(date)).format("DD/MM/YYYY");
       }
     },
-    // Permet d'afficher le champ pour modifier un message
+    
     displayModifyPost(id) {
       const postId = id;
       this.showInputModify == false;
-      let input = document.querySelector('div[inputId="' + id + '"]');
+      let input = document.querySelector('div[inputId="'+id+'"]')
       let inputId = input.getAttribute("inputId");
       let contentPost = document.querySelector('p[contentPostId="' + id + '"]');
       let contentPostId = contentPost.getAttribute("contentPostId");
@@ -370,12 +369,12 @@ export default {
     },
     // Permet de créer un nouveau commentaire
     createComment(id) {
-      const postId = id;
       axios
         .post(
-          "http://localhost:3000/api/comment/" + postId,
+          "http://localhost:3000/api/comment/",
           {
             content: this.contentComment,
+            postId:id
           },
           {
             headers: {

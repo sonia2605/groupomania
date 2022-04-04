@@ -2,7 +2,8 @@ const http = require('http');
 const app = require('./app');
 const cors = require('cors');
 
-require ('dotenv').config();
+//Chemin d'accès pour le fichier .env
+require ('dotenv').config({path:'./config/.env'});
 app.use(cors());
 const normalizePort = val => {
   const port = parseInt(val, 10);
@@ -18,7 +19,7 @@ const normalizePort = val => {
 const port = normalizePort(process.env.PORT || '3000', () => {
   console.log("Server listening on port 3000");
 });
-app.set('port', port);
+app.set('port', process.env.PORT || 3000);
 
 const errorHandler = error => {
   if (error.syscall !== 'listen') {
@@ -47,4 +48,4 @@ server.on('listening', () => {
   console.log('Listening on ' + bind);
 });
 
-server.listen(process.env.PORT);
+server.listen(process.env.PORT || 3000);

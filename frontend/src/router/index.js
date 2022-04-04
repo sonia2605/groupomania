@@ -33,12 +33,8 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(process.env.BASE_URL),
-  routes,
-  scrollBehavior() {
-// Permet de revenir à la position initiale de la page
-    window.scrollTo(0, 0);
-  },
+  history: createWebHashHistory(),
+  routes
 });
 
 router.beforeEach(VueRouteMiddleware())

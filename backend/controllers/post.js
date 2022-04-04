@@ -41,7 +41,7 @@ exports.createPost = (req, res) => {
           .catch((error) =>
             res
               .status(400)
-              .json({ error: "Une erreur s'est produite !" })
+              .json({ error: " ..Erreur !" })
           );
       } else {
         return res.status(404).json({ error: "Utilisateur non trouvé" });
@@ -60,14 +60,18 @@ exports.getAllPosts = (req, res) => {
           model: db.User,
           attributes: ['username']
       },{
-        model: db.Comment
+       model: db.Comment
       }]
   })
   .then(postFound => {
-        return  res.status(200).json(postFound);
+    if(postFound){
+        res.status(200).json(postFound);
+  }else {
+    res.status(404).json ({error: 'Aucun message à afficher'});
+  }
   })
   .catch(error => {
-      res.status(500).send({ error: 'Une erreur s\'est produite !' });
+      res.status(500).send({ error: 'oups, il y a une erreur !' });
   });
 }
 // Permet de modifier un message)
@@ -88,6 +92,7 @@ exports.modifyPost = (req, res) => {
 exports.deletePost = (req, res, next) => {
   // nous utilisons l'ID que nous recevons comme paramètre pour accéder au post correspondant dans la base de données 
   db.Post.findOne ({ 
+    attributes: ['id'],
   where: { id: req.params.postId }})          
   db.Post.destroy({where:{id: req.params.postId }})
   .then(() => res.status(200).json({ message: 'post supprimé !'}))

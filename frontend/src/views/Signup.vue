@@ -75,6 +75,7 @@
 import axios from "axios";
 import { Notyf } from "notyf";
 import "notyf/notyf.min.css";
+
 export default {
   name: "SignupVue",
   data() {

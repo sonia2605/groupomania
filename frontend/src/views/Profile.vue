@@ -64,19 +64,18 @@ export default {
 			}); 
 		},
   
-  methods: {
     // Permet d'afficher les informations de profil
-    displayProfile() {
-      const userId = localStorage.getItem("userId");
-      axios
-        .get("http://localhost:3000/api/user/" + userId, {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        })
-        .then((response) => {
-          this.user = response.data;
-	})
+methods: {
+			displayProfile() {
+				const userId = localStorage.getItem('userId');
+				axios.get('http://localhost:3000/api/user/' + userId, {
+					headers: {
+						Authorization: 'Bearer ' + localStorage.getItem('token')
+					}
+				})
+				.then(response => {
+					this.user = response.data;
+				})
 				.catch(error => {
 					const msgerror = error.response.data
 					this.notyf.error(msgerror.error)

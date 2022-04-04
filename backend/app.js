@@ -4,13 +4,14 @@ require ('dotenv').config();
 // accéder au chemin du système de fichiers
 const path = require('path');
 const helmet = require ('helmet');
-const cors = require('cors');
+//const cors = require('cors');
 const bodyParser = require ('body-parser');
 const app = express();
 
-//const db = require('./models');
-app.use(cors());
+const mongoSanitize = require('express-mongo-sanitize');
+//app.use(cors());
 
+// configure la sécurité des en-têtes
 app.use(helmet());
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -30,8 +31,13 @@ const postRoutes = require('./routes/post');
 const commentRoutes = require('./routes/comment');
 
 //transforme le corps de la requête en objet JS utilisable //
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+
+//Validation des saisies utilisateurs en fonction des caractères interdits "_"
+app.use(mongoSanitize ({
+  replaceWith: '_'
+}));
 
 //Indique à Express qu'il faut gérer la ressource images de manière statique 
 app.use('/images', express.static(path.join(__dirname, 'images')));

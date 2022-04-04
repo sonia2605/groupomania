@@ -26,6 +26,7 @@
     "dotenv": "^16.0.0",
     "email-validator": "^2.0.4",
     "express": "^4.17.3",
+    "express-mongo-sanitize": "^2.2.0",
     "fs": "^0.0.1-security",
     "helmet": "^5.0.2",
     "jsonwebtoken": "^8.5.1",

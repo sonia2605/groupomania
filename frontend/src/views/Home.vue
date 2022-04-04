@@ -58,6 +58,7 @@
 import axios from "axios";
 import { Notyf } from "notyf";
 import "notyf/notyf.min.css";
+
 export default {
   name: "HomeVue",
   data() {
@@ -75,29 +76,30 @@ export default {
       },
     });
   },
-  methods: {
+  
 // Se connecter et recharger la page sans deconnexion utilisateur
-    login() {
-      axios
-        .post("http://localhost:3000/api/user/login", {
-          email: this.email,
-          password: this.password,
-        })
-        .then((response) => {
-          localStorage.setItem("token", response.data.token);
-          localStorage.setItem('userId', response.data.userId);
-          localStorage.setItem('username', response.data.username);
-          localStorage.setItem('isAdmin', response.data.isAdmin);
-          
-          this.$router.push("post");
-        })
-        .catch(error => {
-        const msgerror = error.response.data
-        this.notyf.error(msgerror.error)
-        });
-    },
-  },
-};
+    methods: {
+           login() {
+                axios.post('http://localhost:3000/api/user/login', {
+                    email: this.email,
+                    password: this.password,
+                })
+                .then(response => {
+                    localStorage.setItem('token', response.data.token);
+                    localStorage.setItem('userId', response.data.userId);
+                    localStorage.setItem('username', response.data.username);
+                    localStorage.setItem('isAdmin', response.data.isAdmin);
+
+                    console.log(localStorage);
+                    this.$router.push('post');
+                })
+                .catch(error => {
+                    const msgerror = error.response.data
+                    this.notyf.error(msgerror.error)
+                })
+            }
+        }
+    }
 </script>
 
 <style scoped lang="scss">

@@ -18,14 +18,14 @@ exports.createComment = (req, res) => {
               postId: postFound.id,
               userId: userId
           })
+          console.log(comment);
           comment.save()
               .then(() => res.status(201).json({ message: 'Commentaire créé !' }))
-              .catch(error => res.status(400).json({ error }));
       } else {
           return res.status(404).json({ error: 'Message non trouvé'})
       }
   })
-  .catch(error => res.status(500).json({ error: error }));
+  
 }
 
 // Permet d'afficher tous les commentaires
@@ -35,14 +35,19 @@ exports.getAllComments = (req, res) => {
         where: { postId: req.params.postId },
         include: [{
             model: db.User,
+            attributes: ['username']
         }]
     })
     .then(commentFound => {
-        return res.status(200).json(commentFound);
-                
+        if(commentFound){
+        res.status(200).json(commentFound);
+        console.log(commentFound);
+        }else{
+            res.status(404).json({error: 'Aucun commentaire à afficher'});
+        }
     })
     .catch(error => {
-        res.status(500).send({ error: 'Une erreur s\'est produite !' });
+        res.status(500).send({ error: 'Oups une erreur !' });
         console.log(error);
     });
 }
@@ -50,9 +55,10 @@ exports.getAllComments = (req, res) => {
 
 exports.deleteComment = (req, res) => {
   db.Comment.findOne ({ 
+      attributes: ['id'],
       where: { id: req.params.commentId }})          
         db.Comment.destroy({where:{id: req.params.commentId }})
         .then(() => res.status(200).json({ message: 'commentaire supprimé !'}))
-        .catch(error => res.status(400).json({ error: "Une erreur s'est produite" }));
+        .catch(error => res.status(400).json({ error: "Une erreur!" }));
     
   };
