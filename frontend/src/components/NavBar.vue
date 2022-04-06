@@ -66,7 +66,7 @@ export default {
     ModaleLogout,
   },
   methods: {
-// Permet d'afficher la boîte modale de déconnexion
+    // Permet d'afficher la boîte modale de déconnexion
     displayModale() {
       this.revele = !this.revele;
     },
@@ -95,6 +95,9 @@ export default {
   button {
     font-weight: bold;
     color: #3f3d56;
+    // &.router-link-exact-active {
+    // color: #ff6363;
+    // }
     &:hover,
     &:focus {
       color: #ff6363;

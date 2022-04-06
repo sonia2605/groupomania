@@ -12,7 +12,7 @@ const multer = require('../middlewares/multer-config');
 // Routes de l'API pour les utilisateurs 
 router.post('/signup', userCtrl.signup);
 router.post('/login', userCtrl.login);
-
+router.post('/me', userCtrl.me);
 router.get('/:id', auth, userCtrl.getUserProfile);
 
 router.put('/:id',auth, multer, userCtrl.modifyUserProfile);

@@ -31,7 +31,7 @@ export default {
   name: "ModaleLogout",
   props: ["revele", "displayModale"],
   methods: {
-    logout() {
+  logout() {
       // Permet de se déconnecter
       localStorage.removeItem("token");
       localStorage.removeItem("userId");

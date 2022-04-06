@@ -15,6 +15,7 @@
             placeholder="Que voulez-vous dire ?"
             aria-label="Rédiger un nouveau message"/>
         </div>
+
 <!-- bouton d'importation du fichier -->
         <div class="newPost__option">
           <div class="newPost__option__file">
@@ -60,9 +61,7 @@
             <span class="displayPost__item__information__date"
               >Publié le {{ dateFormat(post.createdAt) }}</span>
         </div>
-    
-
-</div>
+      </div>
 
       <div class="displayPost__item__publication">
           <p
@@ -72,8 +71,7 @@
           >
             {{ post.content }}
           </p>
-      </div>
-  
+
           <img
             v-if="post.imagePost"
             :imgPostId="post.id"
@@ -82,7 +80,7 @@
             class="displayPost__item__publication__image"
             alt="Image insérée dans le message"
           />   
-
+      </div>
 
          <div class ="displayPost__item__option">
            <div>
@@ -95,19 +93,15 @@
             <span
               v-if="post.Comments.length > 0"
               class="displayPost__item__option__count"
-              >{{ post.Comments.length }}</span
-              
-            >
-
-          </div>
-          <i
+              >{{ post.Comments.length }}</span>
+            </div>
+            <i
             v-if="userId == post.UserId || isAdmin == 'true'"
             v-on:click="deletePost(post.id)"
             class="displayPost__item__option__button far fa-trash-alt"
             aria-label="Supprimer le message"
-          ></i>
-        </div>
-  
+            ></i>
+          </div> 
 </div>
 
 <div>
@@ -119,8 +113,8 @@
           <div
             v-bind:showComment="showComment"
             v-if="showComment && post.id == comment.postId"
-            class="displayComment__item__information">
-          >
+            class="displayComment__item">
+          <div class ="displayComment__item__information">
             <div class="displayComment__item__information__user">
                <h2 v-if="comment.User" class="displayComment__item__information__user__name">
                  {{ comment.User.username}}
@@ -148,7 +142,7 @@
               ></i>
             </div>
           </div>
-          </div>
+        </div>
 
         <div  :formId="post.id"
           style="display: none"
@@ -176,13 +170,13 @@
                 <i class="far fa-paper-plane"></i>
               </button>
             </div>
-     
           </form>
-          </div>
+      </div>
+    </div>
 </div>
 
-  <router-view/>
-  </div>
+<router-view/>
+</div>
 </template>
 
 <script>
