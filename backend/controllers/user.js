@@ -194,7 +194,7 @@ exports.deleteAccount = (req, res) => {
       res.status(500).json({ error: "Une erreur s'est produite !" })
     );
 };
-exports.me = (req, res, next) => {
+/*exports.me = (req, res, next) => {
   console.log(req.headers);
   const token = req.headers.authorization.split(" ")[1];
   const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
@@ -218,4 +218,4 @@ exports.me = (req, res, next) => {
     })
     .catch((error)=> ({error: error}));
 };
-
+*/

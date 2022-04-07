@@ -7,17 +7,17 @@ import VueRouteMiddleware from 'vue-route-middleware'
 const routes = [
   {
     path: '/',
-    name: 'Home',
+    name: 'HomeVue',
     component: Home
   },
   {
     path: '/signup',
-    name: 'Signup',
+    name: 'SignupVue',
     component: () => import(/* webpackChunkName: "about" */ '../views/Signup.vue')
   },
   {
     path: '/post',
-    name: 'Post',
+    name: 'PostVue',
     component: () => import(/* webpackChunkName: "about" */ '../views/Post.vue'),
     meta: {
       middleware: auth
@@ -25,7 +25,7 @@ const routes = [
   },
   {
     path: '/profile',
-    name: 'Profile',
+    name: 'ProfileVue',
     component: () => import(/* webpackChunkName: "about" */ '../views/Profile.vue'),
     meta: {
       middleware: auth
@@ -41,6 +41,10 @@ const router = createRouter({
 router.beforeEach(VueRouteMiddleware())
 
 export default router
+
+
+
+
 
 /*=> { 
   if (to.path == ('')){

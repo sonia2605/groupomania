@@ -4,12 +4,12 @@ require ('dotenv').config();
 // accéder au chemin du système de fichiers
 const path = require('path');
 const helmet = require ('helmet');
-//const cors = require('cors');
+const cors = require('cors');
 const bodyParser = require ('body-parser');
 const app = express();
 
 const mongoSanitize = require('express-mongo-sanitize');
-//app.use(cors());
+app.use(cors());
 
 // configure la sécurité des en-têtes
 app.use(helmet());
